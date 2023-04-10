@@ -10,6 +10,7 @@ grammar Cplus;
         :   assignmentExpression (',' assignmentExpression)*
         ;
 
+
     castExpression
         :   '(' typeName ')' castExpression
         |   DigitSequence // for
@@ -39,6 +40,10 @@ grammar Cplus;
         :   logicalAndExpression ( '||' logicalAndExpression)*
         ;
 
+    constantExpression
+        :   logicalOrExpression
+        ;
+
 
     assignmentExpression
         :   logicalOrExpression
@@ -61,6 +66,59 @@ grammar Cplus;
     typeQualifierList
         :   typeQualifier+
         ;
+
+    directDeclarator
+        :   Identifier
+        |   '(' declarator ')'
+        |   directDeclarator '[' typeQualifierList? assignmentExpression? ']'
+        |   directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
+        |   directDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
+        |   directDeclarator '[' typeQualifierList? '*' ']'
+        |   directDeclarator '(' parameterTypeList ')'
+        |   directDeclarator '(' identifierList? ')'
+        ;
+
+    identifierList
+        :   Identifier (',' Identifier)*
+        ;
+
+    parameterTypeList
+        :   parameterDeclaration
+        ;
+
+    parameterList
+        :   parameterDeclaration
+        ;
+
+
+    parameterDeclaration
+          :   declarationSpecifiers declarator
+          |   declarationSpecifiers2 abstractDeclarator?
+          ;
+
+    declarationSpecifiers2
+        :   declarationSpecifier+
+        ;
+
+    abstractDeclarator
+        :   pointer
+        |   pointer? directAbstractDeclarator
+        ;
+
+    directAbstractDeclarator
+        :   '(' abstractDeclarator ')'
+        |   '[' typeQualifierList? assignmentExpression? ']'
+        |   '[' 'static' typeQualifierList? assignmentExpression ']'
+        |   '[' typeQualifierList 'static' assignmentExpression ']'
+        |   '[' '*' ']'
+        |   '(' parameterTypeList? ')'
+        |   directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
+        |   directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
+        |   directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
+        |   directAbstractDeclarator '[' '*' ']'
+        |   directAbstractDeclarator '(' parameterTypeList? ')'
+        ;
+
 
     compilationUnit
         :   translationUnit? EOF
@@ -86,6 +144,7 @@ grammar Cplus;
         |   'char'
         |   'int'
         |   'double'
+        |   'string'
         |   structSpecifier
         |   arraySpecifier
         |   tupleSpecifier
