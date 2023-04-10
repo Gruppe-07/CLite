@@ -1,5 +1,8 @@
 grammar Cplus;
 
+
+    start : translationUnit;
+
     primaryExpression
         :   Identifier
         |   Constant
@@ -421,5 +424,10 @@ grammar Cplus;
 
     LineComment
         :   '//' ~[\r\n]*
+            -> skip
+        ;
+
+    Whitespace
+        :   [ \t]+
             -> skip
         ;
