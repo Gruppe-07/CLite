@@ -50,7 +50,20 @@ grammar Cplus;
 
     assignmentExpression
         :   logicalOrExpression
+        |   unaryExpression assignmentOperator assignmentExpression
         |   DigitSequence // for
+        ;
+
+    unaryExpression
+        :
+        ('++' |  '--' |  'sizeof')*
+        (
+        |   unaryOperator castExpression
+        )
+        ;
+
+    unaryOperator
+        :   '&' | '*' | '+' | '-' | '~' | '!'
         ;
 
 
@@ -429,5 +442,12 @@ grammar Cplus;
 
     Whitespace
         :   [ \t]+
+            -> skip
+        ;
+
+    Newline
+        :   (   '\r' '\n'?
+            |   '\n'
+            )
             -> skip
         ;
