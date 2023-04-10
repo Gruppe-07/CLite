@@ -1,7 +1,8 @@
 grammar Cplus;
 
-
-    start : translationUnit;
+    compilationUnit
+            :   translationUnit? EOF
+            ;
 
     primaryExpression
         :   Identifier
@@ -16,6 +17,7 @@ grammar Cplus;
 
     castExpression
         :   '(' typeName ')' castExpression
+        |    unaryExpression
         |   DigitSequence // for
         ;
 
@@ -51,15 +53,28 @@ grammar Cplus;
     assignmentExpression
         :   logicalOrExpression
         |   unaryExpression assignmentOperator assignmentExpression
-        |   DigitSequence // for
+        |   DigitSequence
         ;
 
     unaryExpression
         :
         ('++' |  '--' |  'sizeof')*
-        (
+        (postfixExpression
         |   unaryOperator castExpression
         )
+        ;
+
+
+
+    postfixExpression
+        :
+        (   primaryExpression
+        |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
+        )
+        ('[' expression ']'
+        | ('.' | '->') Identifier
+        | ('++' | '--')
+        )*
         ;
 
     unaryOperator
@@ -99,7 +114,7 @@ grammar Cplus;
         ;
 
     parameterTypeList
-        :   parameterDeclaration
+        :   parameterList (',' '...')?
         ;
 
     parameterList
@@ -136,9 +151,7 @@ grammar Cplus;
         ;
 
 
-    compilationUnit
-        :   translationUnit? EOF
-        ;
+
 
     translationUnit
         :   externalDeclaration+
@@ -218,6 +231,24 @@ grammar Cplus;
 
     initializer
         :   assignmentExpression
+        |   '{' initializerList ','? '}'
+        ;
+
+    initializerList
+        :   designation? initializer (',' designation? initializer)*
+        ;
+
+    designation
+        :   designatorList '='
+        ;
+
+    designatorList
+        :   designator+
+        ;
+
+    designator
+        :   '[' constantExpression ']'
+        |   '.' Identifier
         ;
 
     declarationSpecifiers
