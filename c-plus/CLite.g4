@@ -304,7 +304,7 @@ grammar CLite;
     iterationStatement
         :   While '(' expression ')' statement
         |   For '(' forCondition ')' statement
-        |   For '(' typeSpecifier Identifier 'in' Identifier ')' statement
+        |   For '(' declarationSpecifier directDeclarator 'in' Identifier ')' statement
         ;
 
     jumpStatement
