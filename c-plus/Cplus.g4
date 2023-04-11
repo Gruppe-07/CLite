@@ -304,6 +304,7 @@ grammar Cplus;
     iterationStatement
         :   While '(' expression ')' statement
         |   For '(' forCondition ')' statement
+        |   For '(' typeSpecifier Identifier 'in' Identifier ')' statement
         ;
 
     jumpStatement
