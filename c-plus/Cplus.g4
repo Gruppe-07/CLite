@@ -279,6 +279,7 @@ grammar Cplus;
         |   expressionStatement
         |   selectionStatement
         |   iterationStatement
+        | jumpStatement
         ;
 
     compoundStatement
@@ -305,6 +306,11 @@ grammar Cplus;
     iterationStatement
         :   While '(' expression ')' statement
         |   For '(' forCondition ')' statement
+        ;
+
+    jumpStatement
+        :   'return' expression?
+        ';'
         ;
 
     forCondition
