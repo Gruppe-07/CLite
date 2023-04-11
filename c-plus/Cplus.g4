@@ -151,8 +151,6 @@ grammar Cplus;
         ;
 
 
-
-
     translationUnit
         :   externalDeclaration+
         ;
@@ -321,9 +319,6 @@ grammar Cplus;
         :   assignmentExpression (',' assignmentExpression)*
         ;
 
-
-
-
     Function : 'function';
     Int : 'int';
     Double : 'double';
@@ -334,6 +329,7 @@ grammar Cplus;
     If : 'if';
     Return : 'return';
     While : 'while';
+    For   : 'for';
     Else : 'else';
 
     LeftParen : '(';
@@ -381,6 +377,24 @@ grammar Cplus;
     IdentifierNondigit
         :   Nondigit
         ;
+
+    StringLiteral
+        :   '"' SCharSequence? '"'
+        ;
+
+    fragment
+    SCharSequence
+        :   SChar+
+        ;
+
+    fragment
+    SChar
+        :   ~["\\\r\n]
+        |   EscapeSequence
+        |   '\\\n'   // Added line
+        |   '\\\r\n' // Added line
+        ;
+
 
     fragment
     Nondigit
