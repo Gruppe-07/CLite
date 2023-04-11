@@ -324,13 +324,14 @@ grammar CLite;
         :   assignmentExpression (',' assignmentExpression)*
         ;
 
+    Const : 'const';
     Function : 'function';
     Int : 'int';
     Double : 'double';
     Tuple : 'tuple';
     Array : 'array';
     Struct : 'struct';
-    String : 'String';
+    String : 'string';
     If : 'if';
     Return : 'return';
     While : 'while';
@@ -357,9 +358,9 @@ grammar CLite;
     Div : '/';
     Mod : '%';
 
-    And : 'and';
-    Or : 'or';
-    Not : 'not';
+    Not : '!';
+    AndAnd : '&&';
+    OrOr : '||';
 
     Semi : ';';
     Comma : ',';
