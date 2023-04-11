@@ -69,10 +69,9 @@ grammar Cplus;
     postfixExpression
         :
         (   primaryExpression
-        |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
+        |   '(' typeName ')' '{' initializerList ','? '}'
         )
         ('[' expression ']'
-        | ('.' | '->') Identifier
         | ('++' | '--')
         )*
         ;
@@ -196,11 +195,10 @@ grammar Cplus;
 
     structDeclarator
         :   declarator
-        |   declarator? ':' constantExpression
         ;
 
     arraySpecifier
-        :   'array' Identifier
+        :   'array' Identifier '=' '{' initializerList '}'
         ;
 
     tupleSpecifier
