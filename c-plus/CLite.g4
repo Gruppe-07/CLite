@@ -1,4 +1,4 @@
-grammar Cplus;
+grammar CLite;
 
     compilationUnit
             :   translationUnit? EOF
