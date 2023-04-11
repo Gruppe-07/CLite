@@ -1,0 +1,7 @@
+function main() {
+    if(a == b) {}
+
+    for (int a in list) {}
+
+    array a = {2,3,5};
+}
