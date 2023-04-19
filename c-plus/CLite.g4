@@ -73,7 +73,7 @@ grammar CLite;
         )
         ('[' expression ']'
         | ('++' | '--')
-        )*
+        )?
         ;
 
     unaryOperator
@@ -171,31 +171,11 @@ grammar CLite;
         |   'int'
         |   'double'
         |   'string'
-        |   structSpecifier
+
         |   arraySpecifier
         |   tupleSpecifier
         ;
 
-    structSpecifier
-        :   'struct' Identifier '{' structDeclarationList '}'
-        ;
-
-    structDeclarationList
-        :   structDeclaration+
-        ;
-
-    structDeclaration // The first two rules have priority order and cannot be simplified to one expression.
-        :   specifierQualifierList structDeclaratorList ';'
-        |   specifierQualifierList ';'
-        ;
-
-    structDeclaratorList
-        :   structDeclarator (',' structDeclarator)*
-        ;
-
-    structDeclarator
-        :   declarator
-        ;
 
     arraySpecifier
         :   'array' Identifier '=' '{' initializerList '}'
@@ -330,7 +310,6 @@ grammar CLite;
     Double : 'double';
     Tuple : 'tuple';
     Array : 'array';
-    Struct : 'struct';
     String : 'string';
     If : 'if';
     Return : 'return';
