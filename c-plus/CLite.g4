@@ -11,18 +11,12 @@ grammar CLite;
         |   '(' expression ')';
 
     expression
-        :   assignmentExpression (',' assignmentExpression)*
-        ;
-
-
-    castExpression
-        :   '(' typeName ')' castExpression
-        |    unaryExpression
-        |   DigitSequence // for
+        :   assignmentStatement (',' assignmentStatement)*
         ;
 
     multiplicativeExpression
-        :   castExpression (('*'|'/'|'%') castExpression)*
+        :   unaryExpression (('*'|'/'|'%') unaryExpression)*
+        |   DigitSequence (('*'|'/'|'%') DigitSequence)*
         ;
 
     additiveExpression
@@ -45,39 +39,31 @@ grammar CLite;
         :   logicalAndExpression ( '||' logicalAndExpression)*
         ;
 
-    constantExpression
-        :   logicalOrExpression
-        ;
 
-
-    assignmentExpression
+    assignmentStatement
         :   logicalOrExpression
-        |   unaryExpression assignmentOperator assignmentExpression
+        |   unaryExpression assignmentOperator assignmentStatement
         |   DigitSequence
         ;
 
     unaryExpression
         :
-        ('++' |  '--' |  'sizeof')*
         (postfixExpression
-        |   unaryOperator castExpression
+        |   unaryOperator multiplicativeExpression
         )
         ;
-
-
 
     postfixExpression
         :
-        (   primaryExpression
-        |   '(' typeName ')' '{' initializerList ','? '}'
-        )
-        ('[' expression ']'
-        | ('++' | '--')
-        )?
+        primaryExpression
+        ( '(' assignmentStatement? ')'
+        | ('++' | '--')?)
         ;
 
+
+
     unaryOperator
-        :   '&' | '*' | '+' | '-' | '~' | '!'
+        :   '!'
         ;
 
 
@@ -86,25 +72,12 @@ grammar CLite;
         ;
 
     declarator
-        :   pointer? directDeclarator
-        ;
-
-    pointer
-        :  ('*' typeQualifierList?)+ // ^ - Blocks language extension
-        ;
-
-    typeQualifierList
-        :   typeQualifier+
+        :    directDeclarator
         ;
 
     directDeclarator
         :   Identifier
         |   '(' declarator ')'
-        |   directDeclarator '[' typeQualifierList? assignmentExpression? ']'
-        |   directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-        |   directDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
-        |   directDeclarator '[' typeQualifierList? '*' ']'
-        |   directDeclarator '(' parameterTypeList ')'
         |   directDeclarator '(' identifierList? ')'
         ;
 
@@ -112,42 +85,10 @@ grammar CLite;
         :   Identifier (',' Identifier)*
         ;
 
-    parameterTypeList
-        :   parameterList (',' '...')?
-        ;
-
-    parameterList
-        :   parameterDeclaration
-        ;
-
 
     parameterDeclaration
           :   declarationSpecifiers declarator
-          |   declarationSpecifiers2 abstractDeclarator?
           ;
-
-    declarationSpecifiers2
-        :   declarationSpecifier+
-        ;
-
-    abstractDeclarator
-        :   pointer
-        |   pointer? directAbstractDeclarator
-        ;
-
-    directAbstractDeclarator
-        :   '(' abstractDeclarator ')'
-        |   '[' typeQualifierList? assignmentExpression? ']'
-        |   '[' 'static' typeQualifierList? assignmentExpression ']'
-        |   '[' typeQualifierList 'static' assignmentExpression ']'
-        |   '[' '*' ']'
-        |   '(' parameterTypeList? ')'
-        |   directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
-        |   directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-        |   directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
-        |   directAbstractDeclarator '[' '*' ']'
-        |   directAbstractDeclarator '(' parameterTypeList? ')'
-        ;
 
 
     translationUnit
@@ -162,7 +103,7 @@ grammar CLite;
         ;
 
     functionDefinition
-        :   'function' declarator declarationList? compoundStatement
+        :   Function Identifier '(' parameterDeclaration? ')' compoundStatement
         ;
 
     typeSpecifier
@@ -171,30 +112,12 @@ grammar CLite;
         |   'int'
         |   'double'
         |   'string'
-
-        |   arraySpecifier
-        |   tupleSpecifier
-        ;
-
-
-    arraySpecifier
-        :   'array' Identifier '=' '{' initializerList '}'
-        ;
-
-    tupleSpecifier
-        :   'tuple' Identifier '{' tupleFields? '}'
-        ;
-
-    tupleFields
-        :   tupleField (',' tupleField)*
-        ;
-
-    tupleField
-        :   declarationSpecifiers declarator
+        |   'array'
+        |   'tuple'
         ;
 
     declaration
-        :   declarationSpecifiers initDeclaratorList? ';'
+        :   ('const')? typeSpecifier initDeclaratorList? ';'
         ;
 
     initDeclaratorList
@@ -206,25 +129,12 @@ grammar CLite;
         ;
 
     initializer
-        :   assignmentExpression
+        :   assignmentStatement
         |   '{' initializerList ','? '}'
         ;
 
     initializerList
-        :   designation? initializer (',' designation? initializer)*
-        ;
-
-    designation
-        :   designatorList '='
-        ;
-
-    designatorList
-        :   designator+
-        ;
-
-    designator
-        :   '[' constantExpression ']'
-        |   '.' Identifier
+        :   initializer (',' initializer)*
         ;
 
     declarationSpecifiers
@@ -233,31 +143,21 @@ grammar CLite;
 
     declarationSpecifier
         :   typeSpecifier
-        |   typeQualifier
-        ;
-
-    declarationList
-        :   declaration+
-        ;
-
-    typeName
-        :   specifierQualifierList
+        |   'const'
         ;
 
     specifierQualifierList
-        :   (typeSpecifier| typeQualifier) specifierQualifierList?
+        :   (typeSpecifier| 'const' ) specifierQualifierList?
         ;
 
-    typeQualifier
-        :   'const'
-        ;
+
 
     statement
         :   compoundStatement
         |   expressionStatement
         |   selectionStatement
         |   iterationStatement
-        | jumpStatement
+        |   jumpStatement
         ;
 
     compoundStatement
@@ -278,13 +178,13 @@ grammar CLite;
         ;
 
     selectionStatement
-        :   'if' '(' expression ')' statement ('else' statement)?
+        :   'if' '(' expression ')' compoundStatement ('else' compoundStatement)?
         ;
 
     iterationStatement
-        :   While '(' expression ')' statement
-        |   For '(' forCondition ')' statement
-        |   For '(' declarationSpecifier directDeclarator 'in' Identifier ')' statement
+        :   While '(' expression ')' compoundStatement
+        |   For '(' forCondition ')' compoundStatement
+        |   For '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement
         ;
 
     jumpStatement
@@ -301,7 +201,7 @@ grammar CLite;
         ;
 
     forExpression
-        :   assignmentExpression (',' assignmentExpression)*
+        :   assignmentStatement (',' assignmentStatement)*
         ;
 
     Const : 'const';

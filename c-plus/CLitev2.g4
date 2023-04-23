@@ -81,17 +81,43 @@ grammar CLitev2;
        ;
 
    assignmentStatement
-       :     typeSpecifier Identifier assignmentOperator expression
+       :    logicalOrExpression
+       |    typeSpecifier Identifier assignmentOperator expression
        |    Identifier assignmentOperator expression
+       |    DigitSequence
        ;
 
    assignmentOperator
         : '='
         ;
 
-   multiplicativeExpression
-       :   DigitSequence (('*'|'/'|'%') DigitSequence)*
+   unaryExpression
+       :
+       ( postfixExpression
+       |   unaryOperator multiplicativeExpression
+       )
        ;
+
+   postfixExpression
+       :
+       (primaryExpression)
+       ('++' | '--')?
+       ;
+
+   primaryExpression
+       :   Identifier
+       |   Constant
+       |   StringLiteral+
+       ;
+
+   unaryOperator
+       :   '!'
+       ;
+
+   multiplicativeExpression
+           :   unaryExpression (('*'|'/'|'%') unaryExpression)*
+           |   DigitSequence (('*'|'/'|'%') DigitSequence)*
+           ;
 
    additiveExpression
        :   multiplicativeExpression (('+'|'-') multiplicativeExpression)*
@@ -144,8 +170,6 @@ grammar CLitev2;
        :   assignmentStatement (',' assignmentStatement)*
        ;
 
-
-
     parameterDeclaration
             :   typeSpecifier Identifier ('[' ']')?
             ;
@@ -157,9 +181,8 @@ grammar CLitev2;
         |   'double'
         |   'string'
         |   'tuple'
+        |   'array'
         ;
-
-
 
     Char : 'char';
     Const : 'const';
@@ -170,6 +193,8 @@ grammar CLitev2;
     Int : 'int';
     Tuple : 'tuple';
     String : 'string';
+    Array : 'array';
+    Function : 'function';
 
 
     Return : 'return';
@@ -222,6 +247,22 @@ grammar CLitev2;
     IdentifierNondigit
         :   Nondigit
         ;
+
+    StringLiteral
+            :   '"' SCharSequence? '"'
+            ;
+    fragment
+        SCharSequence
+            :   SChar+
+            ;
+
+   fragment
+       SChar
+           :   ~["\\\r\n]
+           |   EscapeSequence
+           |   '\\\n'   // Added line
+           |   '\\\r\n' // Added line
+           ;
 
     fragment
     Nondigit
