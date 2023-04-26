@@ -1,5 +1,5 @@
 package org.example.astnodes;
 
-public abstract class ExpressionNode {
+public abstract class ExpressionNode extends AstNode {
 }
 
