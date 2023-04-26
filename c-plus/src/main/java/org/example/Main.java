@@ -19,8 +19,9 @@ public class Main {
                 throw new IOException("Cannot find file: " + fileName);
             }
             InputStream inputStream = url.openStream();
-            ANTLRInputStream antlrInputStream = new ANTLRInputStream(inputStream);
-            CLiteLexer lexer = new CLiteLexer(antlrInputStream);
+            CharStream charStream = CharStreams.fromStream(inputStream);
+
+            CLiteLexer lexer = new CLiteLexer(charStream);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             CLiteParser parser = new CLiteParser(tokenStream);
             ParseTree parseTree = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
@@ -30,4 +31,5 @@ public class Main {
         }
     }
 }
+
 

@@ -60,12 +60,9 @@ grammar CLite;
         | ('++' | '--')?)
         ;
 
-
-
     unaryOperator
         :   '!'
         ;
-
 
     assignmentOperator
         :   '='

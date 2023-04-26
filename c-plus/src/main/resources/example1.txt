@@ -1,7 +1,4 @@
-function main() {
-    if(a == b) {}
+function main(int a) {
+    int i = 0;
 
-    for (int a in list) {}
-
-    array a = {2,3,5};
 }
