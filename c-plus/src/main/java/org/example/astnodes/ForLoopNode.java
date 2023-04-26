@@ -6,3 +6,4 @@ public class ForLoopNode extends StatementNode {
     private ExpressionNode update;
     private BlockNode body;
 }
+
