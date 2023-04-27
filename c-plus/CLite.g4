@@ -56,7 +56,8 @@ grammar CLite;
     postfixExpression
         :
         primaryExpression
-        ('[' expression ']' | '(' assignmentStatement? ')'
+        ('[' expression ']'
+        | '(' assignmentStatement? ')'
         | ('++' | '--')?)
         ;
 
@@ -146,8 +147,6 @@ grammar CLite;
     specifierQualifierList
         :   (typeSpecifier| 'const' ) specifierQualifierList?
         ;
-
-
 
     statement
         :   compoundStatement

@@ -1,5 +1,4 @@
 package org.example.astnodes;
 
-public class AdditionNode extends BinaryExpressionNode {
-
+public class AdditionNode extends AdditiveExpressionNode {
 }

@@ -3,7 +3,7 @@ package org.example.astnodes;
 public abstract class BinaryExpressionNode extends ExpressionNode {
     private ExpressionNode left;
     private ExpressionNode right;
-
+    private String operator;
     public ExpressionNode getLeft() {
         return left;
     }
