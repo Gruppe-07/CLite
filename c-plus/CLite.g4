@@ -56,7 +56,7 @@ grammar CLite;
     postfixExpression
         :
         primaryExpression
-        ( '(' assignmentStatement? ')'
+        ('[' expression ']' | '(' assignmentStatement? ')'
         | ('++' | '--')?)
         ;
 
