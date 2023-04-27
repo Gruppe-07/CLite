@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class IntegerConstant extends ConstantNode {
+public class IntegerConstantNode extends ConstantNode {
 
     public int value;
 
