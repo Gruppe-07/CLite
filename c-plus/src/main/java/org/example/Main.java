@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.tree.*;
 
 import com.myparser.parser.CLiteLexer;
 import com.myparser.parser.CLiteParser;
+import org.example.astnodes.BuildASTVisitor;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,8 +25,9 @@ public class Main {
             CLiteLexer lexer = new CLiteLexer(charStream);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             CLiteParser parser = new CLiteParser(tokenStream);
-            ParseTree parseTree = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
-            // Traverse the parse tree to perform further processing
+            ParseTree cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
+            //BuildASTVisitor ast = new BuildASTVisitor().
+
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public abstract class StatementNode extends AstNode {
+public abstract class StatementNode extends BlockItemNode {
 
 }
 

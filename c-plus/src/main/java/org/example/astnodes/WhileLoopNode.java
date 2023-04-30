@@ -4,5 +4,5 @@ public class WhileLoopNode extends StatementNode {
 
     private ExpressionNode condition;
 
-    private BlockNode body;
+    private CompoundStatementNode body;
 }

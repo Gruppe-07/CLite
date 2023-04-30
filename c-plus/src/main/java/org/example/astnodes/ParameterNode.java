@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class ParameterNode extends AstNode {
+public class ParameterNode extends DeclarationNode {
     public TypeSpecifierNode type;
     public IdentifierNode name;
 

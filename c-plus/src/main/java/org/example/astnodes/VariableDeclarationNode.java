@@ -1,6 +1,7 @@
 package org.example.astnodes;
 
 public class VariableDeclarationNode extends DeclarationNode {
+    public Boolean isConst;
     public TypeSpecifierNode type;
     public IdentifierNode name;
     public ConstantNode value;
@@ -27,5 +28,13 @@ public class VariableDeclarationNode extends DeclarationNode {
 
     public void setValue(ConstantNode value) {
         this.value = value;
+    }
+
+    public Boolean getConst() {
+        return isConst;
+    }
+
+    public void setConst(Boolean aConst) {
+        isConst = aConst;
     }
 }

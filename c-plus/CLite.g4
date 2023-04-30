@@ -5,10 +5,11 @@ grammar CLite;
             ;
 
     primaryExpression
-        :   Identifier
-        |   Constant
-        |   StringLiteral+
-        |   '(' expression ')';
+        :   Identifier          #IdentifierExpr
+        |   Constant            #ConstantExpr
+        |   StringLiteral+      #StringLiteralExpr
+        |   '(' expression ')' #parensExpr
+        ;
 
     expression
         :   assignmentStatement (',' assignmentStatement)*
