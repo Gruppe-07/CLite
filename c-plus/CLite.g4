@@ -86,7 +86,7 @@ grammar CLite;
 
 
     parameterDeclaration
-          :   declarationSpecifiers declarator
+          :   typeSpecifier Identifier
           ;
 
 
@@ -179,9 +179,9 @@ grammar CLite;
         ;
 
     iterationStatement
-        :   While '(' expression ')' compoundStatement
-        |   For '(' forCondition ')' compoundStatement
-        |   For '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement
+        :   While '(' expression ')' compoundStatement #whileLoop
+        |   For '(' forCondition ')' compoundStatement #forLoop
+        |   For '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement #forEachLoop
         ;
 
     jumpStatement
@@ -190,16 +190,14 @@ grammar CLite;
         ;
 
     forCondition
-    	:   (forDeclaration | expression?) ';' forExpression? ';' forExpression?
+    	:   forDeclaration ';' relationalExpression ';' postfixExpression
     	;
 
     forDeclaration
         :   declarationSpecifiers initDeclaratorList?
         ;
 
-    forExpression
-        :   assignmentStatement (',' assignmentStatement)*
-        ;
+
 
     Const : 'const';
     Function : 'function';
@@ -291,7 +289,6 @@ grammar CLite;
     Constant
         :   IntegerConstant
         |   FloatingConstant
-        //|   EnumerationConstant
         |   CharacterConstant
         ;
 

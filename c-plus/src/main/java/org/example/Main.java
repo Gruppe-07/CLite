@@ -25,8 +25,8 @@ public class Main {
             CLiteLexer lexer = new CLiteLexer(charStream);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             CLiteParser parser = new CLiteParser(tokenStream);
-            ParseTree cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
-            //BuildASTVisitor ast = new BuildASTVisitor().
+            var cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
+            var ast = new BuildASTVisitor().visitCompilationUnit(cst);
 
         } catch (IOException e) {
             e.printStackTrace();

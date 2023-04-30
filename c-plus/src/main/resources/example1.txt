@@ -1,4 +1,4 @@
 function main(int a) {
-    int i = 0;
+    a + b;
 
 }
