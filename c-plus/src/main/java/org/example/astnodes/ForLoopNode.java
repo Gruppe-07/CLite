@@ -1,32 +1,32 @@
 package org.example.astnodes;
 
-public class ForLoopNode extends StatementNode {
-    private AssignmentNode initialization;
-    private ExpressionNode condition;
-    private ExpressionNode update;
+public class ForLoopNode extends Statement {
+    private DeclarationNode initialization;
+    private Expression condition;
+    private Expression update;
     private CompoundStatementNode body;
 
-    public AssignmentNode getInitialization() {
+    public DeclarationNode getInitialization() {
         return initialization;
     }
 
-    public void setInitialization(AssignmentNode initialization) {
+    public void setInitialization(DeclarationNode initialization) {
         this.initialization = initialization;
     }
 
-    public ExpressionNode getCondition() {
+    public Expression getCondition() {
         return condition;
     }
 
-    public void setCondition(ExpressionNode condition) {
+    public void setCondition(Expression condition) {
         this.condition = condition;
     }
 
-    public ExpressionNode getUpdate() {
+    public Expression getUpdate() {
         return update;
     }
 
-    public void setUpdate(ExpressionNode update) {
+    public void setUpdate(Expression update) {
         this.update = update;
     }
 

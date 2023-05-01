@@ -1,8 +1,8 @@
 package org.example.astnodes;
 
-public class FunctionCallNode extends PostFixExpressionNode {
+public class FunctionCallNode extends PostFixExpression {
     public IdentifierNode name;
-    public ExpressionNode callValue;
+    public Expression callValue;
 
     public IdentifierNode getName() {
         return name;
@@ -12,11 +12,11 @@ public class FunctionCallNode extends PostFixExpressionNode {
         this.name = name;
     }
 
-    public ExpressionNode getCallValue() {
+    public Expression getCallValue() {
         return callValue;
     }
 
-    public void setCallValue(ExpressionNode callValue) {
+    public void setCallValue(Expression callValue) {
         this.callValue = callValue;
     }
 }

@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class ArrayIndexNode extends PostFixExpressionNode {
+public class ArrayIndexNode extends PostFixExpression {
     public IdentifierNode name;
     public IntegerConstantNode index;
 

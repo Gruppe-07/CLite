@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class CharacterConstant extends ConstantNode {
+public class CharacterConstantNode extends Constant {
 
     public String value;
     public String getValue() {

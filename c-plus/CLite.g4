@@ -70,20 +70,6 @@ grammar CLite;
         :   '='
         ;
 
-    declarator
-        :    directDeclarator
-        ;
-
-    directDeclarator
-        :   Identifier
-        |   '(' declarator ')'
-        |   directDeclarator '(' identifierList? ')'
-        ;
-
-    identifierList
-        :   Identifier (',' Identifier)*
-        ;
-
 
     parameterDeclaration
           :   typeSpecifier Identifier
@@ -116,16 +102,9 @@ grammar CLite;
         ;
 
     declaration
-        :   ('const')? typeSpecifier initDeclaratorList? ';'
+        :   ('const')? typeSpecifier Identifier ('=' initializer)? ';'
         ;
 
-    initDeclaratorList
-        :   initDeclarator (',' initDeclarator)*
-        ;
-
-    initDeclarator
-        :   declarator ('=' initializer)?
-        ;
 
     initializer
         :   assignmentStatement
@@ -136,14 +115,6 @@ grammar CLite;
         :   initializer (',' initializer)*
         ;
 
-    declarationSpecifiers
-        :   declarationSpecifier+
-        ;
-
-    declarationSpecifier
-        :   typeSpecifier
-        |   'const'
-        ;
 
     specifierQualifierList
         :   (typeSpecifier| 'const' ) specifierQualifierList?
@@ -179,9 +150,9 @@ grammar CLite;
         ;
 
     iterationStatement
-        :   While '(' expression ')' compoundStatement #whileLoop
-        |   For '(' forCondition ')' compoundStatement #forLoop
-        |   For '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement #forEachLoop
+        :   While '(' expression ')' compoundStatement
+        |   For '(' forCondition ')' compoundStatement
+        |   Foreach '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement
         ;
 
     jumpStatement
@@ -190,12 +161,8 @@ grammar CLite;
         ;
 
     forCondition
-    	:   forDeclaration ';' relationalExpression ';' postfixExpression
+    	:   declaration relationalExpression ';' postfixExpression
     	;
-
-    forDeclaration
-        :   declarationSpecifiers initDeclaratorList?
-        ;
 
 
 
@@ -210,6 +177,7 @@ grammar CLite;
     Return : 'return';
     While : 'while';
     For   : 'for';
+    Foreach   : 'foreach';
     Else : 'else';
 
     LeftParen : '(';

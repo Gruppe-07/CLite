@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class LogicalOrExpressionNode extends BinaryExpressionNode {
+public class LogicalOrExpressionNode extends BinaryExpression {
     public LogicalAndExpressionNode left;
     public LogicalAndExpressionNode right;
 

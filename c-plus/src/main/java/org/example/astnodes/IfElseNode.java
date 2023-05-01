@@ -1,7 +1,7 @@
 package org.example.astnodes;
 
-public class IfElseNode extends StatementNode {
-    public ExpressionNode condition;
+public class IfElseNode extends Statement {
+    public Expression condition;
     public CompoundStatementNode ifBranch;
     public CompoundStatementNode elseBranch;
 
