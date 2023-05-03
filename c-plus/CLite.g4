@@ -4,13 +4,6 @@ grammar CLite;
             :   translationUnit? EOF
             ;
 
-    primaryExpression
-        :   Identifier          #IdentifierExpr
-        |   Constant            #ConstantExpr
-        |   StringLiteral+      #StringLiteralExpr
-        |   '(' expression ')' #parensExpr
-        ;
-
     expression
         :   assignmentExpression
         ;
@@ -53,11 +46,9 @@ grammar CLite;
         ;
 
     postfixExpression
-        :
-        primaryExpression
-        ('[' expression ']'
-        | '(' assignmentExpression? ')'
-        | ('++' | '--')?)
+        : '(' expression ')'
+        | Identifier ('[' expression ']' | '(' assignmentExpression ')')?
+        | (Identifier | Constant) ('++' | '--')?
         ;
 
     unaryOperator
