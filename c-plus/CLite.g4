@@ -146,7 +146,7 @@ grammar CLite;
         ;
 
     expressionStatement
-        :   expression? ';'
+        :   expression ';'
         ;
 
     selectionStatement

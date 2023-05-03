@@ -58,19 +58,17 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         for(ParseTree child : ctx.blockItemList().children) {
             if(child instanceof CLiteParser.StatementContext) {
-                AstNode astNode = visitStatement((CLiteParser.StatementContext) child);
-                blockItemList.add((BlockItemNode) astNode);
+                BlockItemNode blockItemNode = visitStatement((CLiteParser.StatementContext) child);
+                blockItemList.add(blockItemNode);
             }
 
             else if (child instanceof CLiteParser.DeclarationContext) {
-                AstNode astNode = visitDeclaration((CLiteParser.DeclarationContext) child);
-                blockItemList.add((BlockItemNode) astNode);
+                BlockItemNode blockItemNode = visitDeclaration((CLiteParser.DeclarationContext) child);
+                blockItemList.add(blockItemNode);
             }
         }
         return new CompoundStatementNode(blockItemList);
     }
-
-
 
     @Override
     public DeclarationNode visitDeclaration(CLiteParser.DeclarationContext ctx) {
@@ -101,10 +99,14 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 return visitLogicalOrExpression(ctx.logicalOrExpression());
             }
         }
+        ExpressionNode left = visitUnaryExpression(ctx.unaryExpression());
+        ExpressionNode right = visitAssignmentExpression(ctx.assignmentExpression());
+
+        return new AssignmentNode(left, right);
     }
 
     @Override
-    public AstNode visitStatement(CLiteParser.StatementContext ctx) {
+    public StatementNode visitStatement(CLiteParser.StatementContext ctx) {
         if (ctx.compoundStatement() != null) {
             return visitCompoundStatement(ctx.compoundStatement());
         } else if (ctx.expressionStatement() != null) {
@@ -119,8 +121,22 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             throw new RuntimeException("Unknown statement type: " + ctx.getText());
         }
     }
+
     @Override
-    public AstNode visitIterationStatement(CLiteParser.IterationStatementContext ctx) {
+    public ReturnStatementNode visitJumpStatement(CLiteParser.JumpStatementContext ctx) {
+        if (ctx.expression() != null) {
+            return new ReturnStatementNode(visitExpression(ctx.expression()));
+        }
+        return new ReturnStatementNode();
+    }
+
+    @Override
+    public StatementNode visitExpressionStatement(CLiteParser.ExpressionStatementContext ctx) {
+        return new ExpressionStatementNode(visitExpression(ctx.expression()));
+    }
+
+    @Override
+    public StatementNode visitIterationStatement(CLiteParser.IterationStatementContext ctx) {
         if (ctx.For() != null)
             return visitForLoop(ctx);
         else if (ctx.While() != null)
@@ -151,7 +167,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         DeclarationNode initialization = visitDeclaration(ctx.forCondition().declaration());
         ExpressionNode condition = visitRelationalExpression(ctx.forCondition().relationalExpression());
-        PostFixExpressionNode update = visitPostfixExpression(ctx.forCondition().postfixExpression());
+        ExpressionNode update = visitPostfixExpression(ctx.forCondition().postfixExpression());
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
 
         forLoopNode.setInitialization(initialization);
@@ -174,7 +190,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             for(ParseTree child: ctx.children){
                 if (child instanceof CLiteParser.UnaryExpressionContext){
                     operands.add(visitUnaryExpression((CLiteParser.UnaryExpressionContext) child));
-
                 }
                 else {
                     operators.add(child.getText());
@@ -320,6 +335,34 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     @Override
+    public FunctionCallNode visitFunctionCall(CLiteParser.FunctionCallContext ctx) {
+        IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
+        ExpressionNode callValue = visitAssignmentExpression(ctx.assignmentExpression());
+
+        return new FunctionCallNode(identifierNode, callValue);
+    }
+
+    @Override
+    public PostFixExpressionNode visitIncrementDecrement(CLiteParser.IncrementDecrementContext ctx) {
+        if (ctx.Constant() != null) {
+            String str = ctx.Constant().getText();
+
+            try {
+                double d = Double.parseDouble(str);
+                return new PostFixExpressionNode(new FloatConstantNode(d), ctx.children.get(1).getText());
+            } catch (NumberFormatException e1) {
+                try {
+                    int i = Integer.parseInt(str);
+                    return new PostFixExpressionNode(new IntegerConstantNode(i), ctx.children.get(1).getText());
+                } catch (NumberFormatException e2) {
+                    return new PostFixExpressionNode(new CharacterConstantNode(str), ctx.children.get(1).getText());
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public ParensExpressionNode visitParensExpression(CLiteParser.ParensExpressionContext ctx) {
         if (ctx.expression() != null) {
             return new ParensExpressionNode(visitExpression(ctx.expression()));
@@ -336,25 +379,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         return new ArrayIndexNode(identifierNode, expressionNode);
     }
-
-
-
-    /*@Override
-    public ExpressionNode visitPostfixExpression(CLiteParser.PostfixExpressionContext ctx) {
-
-        if (ctx.expression() != null){
-            return new ArrayIndexNode(visitPrimaryExpression(ctx.primaryExpression()));
-        }
-        if (ctx.assignmentExpression() != null){
-            return new FunctionCallNode(visitAssignmentExpression(ctx.assignmentExpression()));
-        }
-        else {
-            String operator = (ctx.children.get(1).getText());
-            return new PostFixExpressionNode(visitPrimaryExpression(ctx.primaryExpression()), operator);
-        }
-    } */
-
-    
 
 
     //Statements

@@ -2,7 +2,7 @@ package org.example.astnodes;
 
 import java.util.List;
 
-public class CompoundStatementNode extends AstNode {
+public class CompoundStatementNode extends StatementNode {
     public List<BlockItemNode> blockItemList;
 
     public CompoundStatementNode(List<BlockItemNode> blockItemList) {

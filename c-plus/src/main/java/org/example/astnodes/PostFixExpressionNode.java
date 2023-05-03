@@ -1,8 +1,12 @@
 package org.example.astnodes;
 
-public abstract class PostFixExpressionNode extends UnaryExpressionNode {
+public class PostFixExpressionNode extends UnaryExpressionNode {
+    public ExpressionNode identifierOrConstant;
+    public String operator;
 
-
-
+    public PostFixExpressionNode(ExpressionNode identifierOrConstant, String operator) {
+        this.identifierOrConstant = identifierOrConstant;
+        this.operator = operator;
+    }
 }
 
