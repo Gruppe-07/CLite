@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class FloatConstantNode extends Constant {
+public class FloatConstantNode extends ConstantNode {
     public double value;
 
     public double getValue() {

@@ -4,7 +4,7 @@ public class VariableDeclarationNode extends DeclarationNode {
     public Boolean isConst;
     public TypeSpecifierNode type;
     public IdentifierNode name;
-    public Constant value;
+    public ConstantNode value;
 
     public TypeSpecifierNode getType() {
         return type;
@@ -22,11 +22,11 @@ public class VariableDeclarationNode extends DeclarationNode {
         this.name = name;
     }
 
-    public Constant getValue() {
+    public ConstantNode getValue() {
         return value;
     }
 
-    public void setValue(Constant value) {
+    public void setValue(ConstantNode value) {
         this.value = value;
     }
 

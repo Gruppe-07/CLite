@@ -1,10 +1,10 @@
 package org.example.astnodes;
 
-public class AssignmentNode extends Statement {
+public class AssignmentNode extends StatementNode {
 
     public TypeSpecifierNode typeSpecifier;
     public IdentifierNode identifierNode;
-    public Constant constant;
+    public ConstantNode constant;
 
     public TypeSpecifierNode getTypeSpecifier() {
         return typeSpecifier;
@@ -22,11 +22,11 @@ public class AssignmentNode extends Statement {
         this.identifierNode = identifierNode;
     }
 
-    public Constant getConstant() {
+    public ConstantNode getConstant() {
         return constant;
     }
 
-    public void setConstant(Constant constant) {
+    public void setConstant(ConstantNode constant) {
         this.constant = constant;
     }
 }

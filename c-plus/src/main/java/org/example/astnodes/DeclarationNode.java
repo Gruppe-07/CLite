@@ -2,11 +2,11 @@ package org.example.astnodes;
 
 import java.util.List;
 
-public class DeclarationNode extends BlockItem {
+public class DeclarationNode extends BlockItemNode {
     public Boolean isConst;
     public TypeSpecifierNode typeSpecifierNode;
     public List<IdentifierNode> declaratorNodeList;
-    public List<Constant> initializerNodeList;
+    public List<ConstantNode> initializerNodeList;
 
     public DeclarationNode() {
     }
@@ -35,11 +35,11 @@ public class DeclarationNode extends BlockItem {
         this.declaratorNodeList = declaratorNodeList;
     }
 
-    public List<Constant> getInitializerNodeList() {
+    public List<ConstantNode> getInitializerNodeList() {
         return initializerNodeList;
     }
 
-    public void setInitializerNodeList(List<Constant> initializerNodeList) {
+    public void setInitializerNodeList(List<ConstantNode> initializerNodeList) {
         this.initializerNodeList = initializerNodeList;
     }
 }

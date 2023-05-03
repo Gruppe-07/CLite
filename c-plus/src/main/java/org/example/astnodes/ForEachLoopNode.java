@@ -1,6 +1,6 @@
 package org.example.astnodes;
 
-public class ForEachLoopNode extends Statement {
+public class ForEachLoopNode extends StatementNode {
     public TypeSpecifierNode typeSpecifierNode;
     public IdentifierNode elementIdentifierNode;
     public IdentifierNode arrayIdentifierNode;

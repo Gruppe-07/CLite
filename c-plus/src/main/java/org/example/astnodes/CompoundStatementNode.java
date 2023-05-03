@@ -3,18 +3,18 @@ package org.example.astnodes;
 import java.util.List;
 
 public class CompoundStatementNode extends AstNode {
-    public List<BlockItem> blockItemList;
+    public List<BlockItemNode> blockItemList;
 
-    public CompoundStatementNode(List<BlockItem> blockItemList) {
+    public CompoundStatementNode(List<BlockItemNode> blockItemList) {
         this.blockItemList = blockItemList;
     }
 
 
-    public List<BlockItem> getBlockItemNodeList() {
+    public List<BlockItemNode> getBlockItemNodeList() {
         return blockItemList;
     }
 
-    public void setBlockItemNodeList(List<BlockItem> blockItemList) {
+    public void setBlockItemNodeList(List<BlockItemNode> blockItemList) {
         this.blockItemList = blockItemList;
     }
 }

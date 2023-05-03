@@ -54,17 +54,17 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public CompoundStatementNode visitCompoundStatement(CLiteParser.CompoundStatementContext ctx) {
-        List<BlockItem> blockItemList = new ArrayList<>();
+        List<BlockItemNode> blockItemList = new ArrayList<>();
 
         for(ParseTree child : ctx.blockItemList().children) {
             if(child instanceof CLiteParser.StatementContext) {
                 AstNode astNode = visitStatement((CLiteParser.StatementContext) child);
-                blockItemList.add((BlockItem) astNode);
+                blockItemList.add((BlockItemNode) astNode);
             }
 
             else if (child instanceof CLiteParser.DeclarationContext) {
                 AstNode astNode = visitDeclaration((CLiteParser.DeclarationContext) child);
-                blockItemList.add((BlockItem) astNode);
+                blockItemList.add((BlockItemNode) astNode);
             }
         }
         return new CompoundStatementNode(blockItemList);
@@ -89,7 +89,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     @Override
-    public Expression visitExpression(CLiteParser.ExpressionContext ctx) {
+    public ExpressionNode visitExpression(CLiteParser.ExpressionContext ctx) {
 
     }
 
@@ -139,7 +139,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     public WhileLoopNode visitWhileLoop(CLiteParser.IterationStatementContext ctx) {
-        Expression condition = (Expression) visitExpression(ctx.expression());
+        ExpressionNode condition = visitExpression(ctx.expression());
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
         return new WhileLoopNode(condition, body);
     }
@@ -150,7 +150,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         DeclarationNode initialization = visitDeclaration(ctx.forCondition().declaration());
         RelationalExpressionNode condition = visitRelationalExpression(ctx.forCondition().relationalExpression());
-        PostFixExpression update = visitPostfixExpression(ctx.forCondition().postfixExpression());
+        PostFixExpressionNode update = visitPostfixExpression(ctx.forCondition().postfixExpression());
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
 
         forLoopNode.setInitialization(initialization);
@@ -160,5 +160,154 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         return forLoopNode;
     }
+
+
+
+    //Expressions
+
+    @Override public ExpressionNode visitMultiplicativeExpression(CLiteParser.MultiplicativeExpressionContext ctx) {
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.UnaryExpressionContext){
+                    operands.add(visitUnaryExpression((CLiteParser.UnaryExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new MultiplicativeExpressionNode(operands, operators);
+        }
+        return visitUnaryExpression(ctx.unaryExpression(0));
+    }
+
+    @Override public ExpressionNode visitAdditiveExpression(CLiteParser.AdditiveExpressionContext ctx) {
+
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.MultiplicativeExpressionContext){
+                    operands.add(visitMultiplicativeExpression((CLiteParser.MultiplicativeExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new AdditiveExpressionNode(operands, operators);
+        }
+        return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));
+    }
+
+    @Override public ExpressionNode visitRelationalExpression(CLiteParser.RelationalExpressionContext ctx) {
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.AdditiveExpressionContext){
+                    operands.add(visitAdditiveExpression((CLiteParser.AdditiveExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new RelationalExpressionNode(operands, operators);
+        }
+        return visitAdditiveExpression(ctx.additiveExpression(0));
+    }
+
+    @Override public ExpressionNode visitEqualityExpression(CLiteParser.EqualityExpressionContext ctx) {
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.RelationalExpressionContext){
+                    operands.add(visitRelationalExpression((CLiteParser.RelationalExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new EqualityExpressionNode(operands, operators);
+        }
+        return visitRelationalExpression(ctx.relationalExpression(0));
+    }
+
+    @Override
+    public ExpressionNode visitLogicalAndExpression(CLiteParser.LogicalAndExpressionContext ctx) {
+
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.EqualityExpressionContext){
+                    operands.add(visitEqualityExpression((CLiteParser.EqualityExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new LogicalAndExpressionNode(operands, operators);
+        }
+        return visitEqualityExpression(ctx.equalityExpression(0));
+    }
+
+    @Override
+    public ExpressionNode visitLogicalOrExpression(CLiteParser.LogicalOrExpressionContext ctx) {
+
+        if (ctx.children.size() > 1) {
+            List<ExpressionNode> operands = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
+
+            for(ParseTree child: ctx.children){
+                if (child instanceof CLiteParser.LogicalAndExpressionContext){
+                    operands.add(visitLogicalAndExpression((CLiteParser.LogicalAndExpressionContext) child));
+
+                }
+                else {
+                    operators.add(child.getText());
+                }
+            }
+            return new LogicalOrExpressionNode(operands, operators);
+        }
+        return visitLogicalAndExpression(ctx.logicalAndExpression(0));
+    }
+
+
+
+    //Unary Expressions
+    @Override
+    public UnaryExpressionNode visitUnaryExpression(CLiteParser.UnaryExpressionContext ctx) {
+
+    }
+
+
+
+    //Statements
+    @Override public IfElseNode visitSelectionStatement(CLiteParser.SelectionStatementContext ctx) {
+
+        ExpressionNode expressionNode = visitExpression(ctx.expression());
+
+        CompoundStatementNode ifBranch = visitCompoundStatement(ctx.compoundStatement(0));
+
+        if (ctx.compoundStatement(1) != null) {
+            CompoundStatementNode elseBranch = visitCompoundStatement(ctx.compoundStatement(0));
+            return new IfElseNode(expressionNode, ifBranch, elseBranch);
+        }
+
+        return new IfElseNode(expressionNode, ifBranch);
+    }
+
 
 }

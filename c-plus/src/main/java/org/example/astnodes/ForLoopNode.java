@@ -1,9 +1,9 @@
 package org.example.astnodes;
 
-public class ForLoopNode extends Statement {
+public class ForLoopNode extends StatementNode {
     private DeclarationNode initialization;
-    private Expression condition;
-    private Expression update;
+    private ExpressionNode condition;
+    private ExpressionNode update;
     private CompoundStatementNode body;
 
     public DeclarationNode getInitialization() {
@@ -14,19 +14,19 @@ public class ForLoopNode extends Statement {
         this.initialization = initialization;
     }
 
-    public Expression getCondition() {
+    public ExpressionNode getCondition() {
         return condition;
     }
 
-    public void setCondition(Expression condition) {
+    public void setCondition(ExpressionNode condition) {
         this.condition = condition;
     }
 
-    public Expression getUpdate() {
+    public ExpressionNode getUpdate() {
         return update;
     }
 
-    public void setUpdate(Expression update) {
+    public void setUpdate(ExpressionNode update) {
         this.update = update;
     }
 
