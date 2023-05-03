@@ -32,7 +32,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             return new ExternalDeclarationNode(visitDeclaration(ctx.declaration()));
         else if (ctx.functionDefinition() != null)
             return new ExternalDeclarationNode(visitFunctionDefinition(ctx.functionDefinition()));
-        return null;
+       return null;
     }
 
     @Override
@@ -90,17 +90,15 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public Expression visitExpression(CLiteParser.ExpressionContext ctx) {
-        for (ParseTree child : ctx.children) {
-            return visitAssignmentStatement(child);
-        }
+
     }
 
     @Override
-    public AssignmentNode visitAssignmentStatement(CLiteParser.AssignmentStatementContext ctx) {
-        AssignmentNode assignmentNode = new AssignmentNode();
-        if (ctx.logicalOrExpression() != null) {
-            assignmentNode.
-            return visitLogicalOrExpression(ctx.logicalOrExpression());
+    public AstNode visitAssignmentExpression(CLiteParser.AssignmentExpressionContext ctx) {
+        if (ctx.children.size() < 2) {
+            if (ctx.logicalOrExpression() != null) {
+                return visitLogicalOrExpression(ctx.logicalOrExpression());
+            }
         }
     }
 

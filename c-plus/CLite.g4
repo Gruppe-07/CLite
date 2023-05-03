@@ -12,7 +12,7 @@ grammar CLite;
         ;
 
     expression
-        :   assignmentStatement (',' assignmentStatement)*
+        :   assignmentExpression (',' assignmentExpression)*
         ;
 
     multiplicativeExpression
@@ -41,9 +41,9 @@ grammar CLite;
         ;
 
 
-    assignmentStatement
+    assignmentExpression
         :   logicalOrExpression
-        |   unaryExpression assignmentOperator assignmentStatement
+        |   unaryExpression assignmentOperator assignmentExpression
         |   DigitSequence
         ;
 
@@ -58,7 +58,7 @@ grammar CLite;
         :
         primaryExpression
         ('[' expression ']'
-        | '(' assignmentStatement? ')'
+        | '(' assignmentExpression? ')'
         | ('++' | '--')?)
         ;
 
@@ -84,7 +84,6 @@ grammar CLite;
     externalDeclaration
         :   functionDefinition
         |   declaration
-        |   ';' // stray ;
         ;
 
     functionDefinition
@@ -97,7 +96,7 @@ grammar CLite;
         |   'int'
         |   'double'
         |   'string'
-        |   'array'
+        |   'array' ('<'typeSpecifier'>')?
         |   'tuple'
         ;
 
@@ -107,7 +106,7 @@ grammar CLite;
 
 
     initializer
-        :   assignmentStatement
+        :   assignmentExpression
         |   '{' initializerList ','? '}'
         ;
 
