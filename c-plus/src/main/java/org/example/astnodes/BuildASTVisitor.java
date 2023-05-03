@@ -90,11 +90,11 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public Expression visitExpression(CLiteParser.ExpressionContext ctx) {
-
+        return visitAssignmentExpression(ctx.assignmentExpression());
     }
 
     @Override
-    public AstNode visitAssignmentExpression(CLiteParser.AssignmentExpressionContext ctx) {
+    public Expression visitAssignmentExpression(CLiteParser.AssignmentExpressionContext ctx) {
         if (ctx.children.size() < 2) {
             if (ctx.logicalOrExpression() != null) {
                 return visitLogicalOrExpression(ctx.logicalOrExpression());

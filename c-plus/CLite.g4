@@ -12,12 +12,11 @@ grammar CLite;
         ;
 
     expression
-        :   assignmentExpression (',' assignmentExpression)*
+        :   assignmentExpression
         ;
 
     multiplicativeExpression
         :   unaryExpression (('*'|'/'|'%') unaryExpression)*
-        |   DigitSequence (('*'|'/'|'%') DigitSequence)*
         ;
 
     additiveExpression
@@ -44,7 +43,6 @@ grammar CLite;
     assignmentExpression
         :   logicalOrExpression
         |   unaryExpression assignmentOperator assignmentExpression
-        |   DigitSequence
         ;
 
     unaryExpression
