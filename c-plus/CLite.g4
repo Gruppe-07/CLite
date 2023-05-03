@@ -46,9 +46,25 @@ grammar CLite;
         ;
 
     postfixExpression
+        : parensExpression
+        | arrayIndex
+        | functionCall
+        | incrementDecrement
+        ;
+
+    parensExpression
         : '(' expression ')'
-        | Identifier ('[' expression ']' | '(' assignmentExpression ')')?
-        | (Identifier | Constant) ('++' | '--')?
+        ;
+
+    arrayIndex
+        : Identifier  '[' expression ']'
+        ;
+
+    functionCall
+        : Identifier '(' assignmentExpression ')'
+        ;
+    incrementDecrement
+        : (Identifier | Constant) ('++' | '--')?
         ;
 
     unaryOperator

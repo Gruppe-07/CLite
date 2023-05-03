@@ -1,22 +1,11 @@
 package org.example.astnodes;
 
-public class ArrayIndexNode extends PostFixExpressionNode {
+public class ArrayIndexNode extends ExpressionNode {
     public IdentifierNode name;
-    public IntegerConstantNode index;
+    public ExpressionNode expressionNode;
 
-    public IdentifierNode getName() {
-        return name;
-    }
-
-    public void setName(IdentifierNode name) {
+    public ArrayIndexNode(IdentifierNode name, ExpressionNode expressionNode) {
         this.name = name;
-    }
-
-    public IntegerConstantNode getIndex() {
-        return index;
-    }
-
-    public void setIndex(IntegerConstantNode index) {
-        this.index = index;
+        this.expressionNode = expressionNode;
     }
 }

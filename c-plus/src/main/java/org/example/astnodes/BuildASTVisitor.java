@@ -89,10 +89,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     @Override
-
-    public ExpressionNode visitExpression(CLiteParser.ExpressionContext ctx) {
-
-
     public ExpressionNode visitExpression(CLiteParser.ExpressionContext ctx) {
         return visitAssignmentExpression(ctx.assignmentExpression());
 
@@ -148,13 +144,13 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
         return new WhileLoopNode(condition, body);
     }
-    
+
 
     public ForLoopNode visitForLoop(CLiteParser.IterationStatementContext ctx) {
         ForLoopNode forLoopNode = new ForLoopNode();
 
         DeclarationNode initialization = visitDeclaration(ctx.forCondition().declaration());
-        RelationalExpressionNode condition = visitRelationalExpression(ctx.forCondition().relationalExpression());
+        ExpressionNode condition = visitRelationalExpression(ctx.forCondition().relationalExpression());
         PostFixExpressionNode update = visitPostfixExpression(ctx.forCondition().postfixExpression());
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
 
@@ -290,13 +286,75 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
 
-
     //Unary Expressions
     @Override
-    public UnaryExpressionNode visitUnaryExpression(CLiteParser.UnaryExpressionContext ctx) {
-
+    public ExpressionNode visitUnaryExpression(CLiteParser.UnaryExpressionContext ctx) {
+        if (ctx.postfixExpression() != null) {
+            return visitPostfixExpression(ctx.postfixExpression());
+        }
+        if (ctx.unaryOperator() != null && ctx.multiplicativeExpression() != null){
+            return new NegationNode(visitMultiplicativeExpression(ctx.multiplicativeExpression()));
+        }
+        else {
+            throw new RuntimeException("Unknown statement type: " + ctx.getText());
+        }
     }
 
+    @Override
+    public ExpressionNode visitPostfixExpression(CLiteParser.PostfixExpressionContext ctx) {
+        if (ctx.parensExpression() != null) {
+            return visitParensExpression(ctx.parensExpression());
+        }
+        if (ctx.arrayIndex() != null) {
+            return visitArrayIndex(ctx.arrayIndex());
+        }
+        if (ctx.functionCall() != null) {
+            return visitFunctionCall(ctx.functionCall());
+        }
+        if (ctx.incrementDecrement() != null) {
+            return visitIncrementDecrement(ctx.incrementDecrement());
+        }
+        else {
+            throw new RuntimeException("Unknown statement type: " + ctx.getText());
+        }
+    }
+
+    @Override
+    public ParensExpressionNode visitParensExpression(CLiteParser.ParensExpressionContext ctx) {
+        if (ctx.expression() != null) {
+            return new ParensExpressionNode(visitExpression(ctx.expression()));
+        }
+        else {
+            throw new RuntimeException("Unknown statement type: " + ctx.getText());
+        }
+    }
+
+    @Override
+    public ArrayIndexNode visitArrayIndex(CLiteParser.ArrayIndexContext ctx) {
+        IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
+        ExpressionNode expressionNode = visitExpression(ctx.expression());
+
+        return new ArrayIndexNode(identifierNode, expressionNode);
+    }
+
+
+
+    /*@Override
+    public ExpressionNode visitPostfixExpression(CLiteParser.PostfixExpressionContext ctx) {
+
+        if (ctx.expression() != null){
+            return new ArrayIndexNode(visitPrimaryExpression(ctx.primaryExpression()));
+        }
+        if (ctx.assignmentExpression() != null){
+            return new FunctionCallNode(visitAssignmentExpression(ctx.assignmentExpression()));
+        }
+        else {
+            String operator = (ctx.children.get(1).getText());
+            return new PostFixExpressionNode(visitPrimaryExpression(ctx.primaryExpression()), operator);
+        }
+    } */
+
+    
 
 
     //Statements
