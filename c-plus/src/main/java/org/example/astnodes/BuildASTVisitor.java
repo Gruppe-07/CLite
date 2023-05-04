@@ -137,13 +137,18 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public ReturnStatementNode visitJumpStatement(CLiteParser.JumpStatementContext ctx) {
-        List<ExpressionNode> returnValues = new ArrayList<>();
-        if (ctx.expression() != null) {
-            for (CLiteParser.ExpressionContext child : ctx.expression()) {
-                returnValues.add(visitExpression(child));
-            }
+        if (ctx.expression().size() == 1) {
+            return new ReturnStatementNode(visitExpression(ctx.expression(0)));
         }
-        return new ReturnStatementNode(returnValues);
+        if (ctx.expression().size() > 2) {
+            List<ExpressionNode> expressionNodeList = new ArrayList<>();
+            for (CLiteParser.ExpressionContext child : ctx.expression()) {
+                expressionNodeList.add(visitExpression(child));
+            }
+            TupleNode tupleNode = new TupleNode(expressionNodeList);
+            return new ReturnStatementNode(tupleNode);
+        }
+        return null;
     }
 
     @Override
