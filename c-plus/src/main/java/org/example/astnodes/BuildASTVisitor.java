@@ -19,8 +19,8 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
     public TranslationUnitNode visitTranslationUnit(CLiteParser.TranslationUnitContext ctx) {
         List<ExternalDeclarationNode> externalDeclarationNodeList = new ArrayList<>();
-        for (ParseTree child : ctx.children) {
-            externalDeclarationNodeList.add(visitExternalDeclaration((CLiteParser.ExternalDeclarationContext) child));
+        for (CLiteParser.ExternalDeclarationContext child : ctx.externalDeclaration()) {
+            externalDeclarationNodeList.add(visitExternalDeclaration(child));
         }
         return new TranslationUnitNode(externalDeclarationNodeList);
     }
@@ -76,35 +76,33 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
         declarationNode.setTypeSpecifierNode(new TypeSpecifierNode(ctx.typeSpecifier().getText()));
 
-        List<ExpressionNode> initializerList;
-        if (ctx.initializer() != null) {
-            initializerList = visitInitializer(ctx.initializer());
-            declarationNode.setInitializerNodeList(initializerList);
+        List<IdentifierNode> identifierNodeList = new ArrayList<>();
+
+        for (ParseTree child : ctx.Identifier()) {
+            identifierNodeList.add(new IdentifierNode(child.getText()));
+            declarationNode.setDeclaratorNodeList(identifierNodeList);
         }
 
-
+        if (ctx.initializer() != null) {
+            declarationNode.setInitializerNode(visitInitializer(ctx.initializer()));
+        }
         return declarationNode;
     }
 
     @Override
-    public List<ExpressionNode> visitInitializer(CLiteParser.InitializerContext ctx) {
+    public InitializerNode visitInitializer(CLiteParser.InitializerContext ctx) {
         List<ExpressionNode> expressionNodeList = new ArrayList<>();
         if (ctx.assignmentExpression() != null) {
-            expressionNodeList.add(visitAssignmentExpression(ctx.assignmentExpression()));
-            return expressionNodeList;
-        }
-        else {
-            for (ParseTree child : ctx.children) {
-                expressionNodeList.add(visitInitializer(child));
+            for (CLiteParser.AssignmentExpressionContext child : ctx.assignmentExpression()) {
+                expressionNodeList.add(visitAssignmentExpression(child));
             }
         }
-
+        return new InitializerNode(expressionNodeList);
     }
 
     @Override
     public ExpressionNode visitExpression(CLiteParser.ExpressionContext ctx) {
         return visitAssignmentExpression(ctx.assignmentExpression());
-
     }
 
     @Override
@@ -139,10 +137,13 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public ReturnStatementNode visitJumpStatement(CLiteParser.JumpStatementContext ctx) {
+        List<ExpressionNode> returnValues = new ArrayList<>();
         if (ctx.expression() != null) {
-            return new ReturnStatementNode(visitExpression(ctx.expression()));
+            for (CLiteParser.ExpressionContext child : ctx.expression()) {
+                returnValues.add(visitExpression(child));
+            }
         }
-        return new ReturnStatementNode();
+        return new ReturnStatementNode(returnValues);
     }
 
     @Override
@@ -224,7 +225,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             for(ParseTree child: ctx.children){
                 if (child instanceof CLiteParser.MultiplicativeExpressionContext){
                     operands.add(visitMultiplicativeExpression((CLiteParser.MultiplicativeExpressionContext) child));
-
                 }
                 else {
                     operators.add(child.getText());

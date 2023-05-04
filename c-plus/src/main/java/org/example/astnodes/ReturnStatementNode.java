@@ -1,13 +1,20 @@
 package org.example.astnodes;
 
-public class ReturnStatementNode extends StatementNode {
-    public ExpressionNode returnValue;
+import java.util.List;
 
-    public ReturnStatementNode(ExpressionNode returnValue) {
+public class ReturnStatementNode extends StatementNode {
+    public List<ExpressionNode> returnValue;
+
+    public ReturnStatementNode(List<ExpressionNode> returnValue) {
         this.returnValue = returnValue;
     }
 
-    public ReturnStatementNode() {
+    public List<ExpressionNode> getReturnValue() {
+        return returnValue;
+    }
 
+    public void setReturnValue(List<ExpressionNode> returnValue) {
+        this.returnValue = returnValue;
     }
 }
+

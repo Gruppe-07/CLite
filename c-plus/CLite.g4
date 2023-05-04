@@ -106,7 +106,7 @@ grammar CLite;
         ;
 
     declaration
-        :   ('const')? typeSpecifier Identifier ('=' initializer)? ';'
+        :   ('const')? typeSpecifier Identifier (',' Identifier)* ('=' initializer)? ';'
         ;
 
 
