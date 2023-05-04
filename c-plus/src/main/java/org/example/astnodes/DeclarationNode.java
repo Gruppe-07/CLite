@@ -6,7 +6,7 @@ public class DeclarationNode extends BlockItemNode {
     public Boolean isConst;
     public TypeSpecifierNode typeSpecifierNode;
     public List<IdentifierNode> declaratorNodeList;
-    public List<ConstantNode> initializerNodeList;
+    public List<ExpressionNode> initializerNodeList;
 
     public DeclarationNode() {
     }
@@ -19,6 +19,7 @@ public class DeclarationNode extends BlockItemNode {
         isConst = aConst;
     }
 
+
     public TypeSpecifierNode getTypeSpecifierNode() {
         return typeSpecifierNode;
     }
@@ -27,19 +28,11 @@ public class DeclarationNode extends BlockItemNode {
         this.typeSpecifierNode = typeSpecifierNode;
     }
 
-    public List<IdentifierNode> getDeclaratorNodeList() {
-        return declaratorNodeList;
-    }
-
-    public void setDeclaratorNodeList(List<IdentifierNode> declaratorNodeList) {
-        this.declaratorNodeList = declaratorNodeList;
-    }
-
-    public List<ConstantNode> getInitializerNodeList() {
+    public List<ExpressionNode> getInitializerNodeList() {
         return initializerNodeList;
     }
 
-    public void setInitializerNodeList(List<ConstantNode> initializerNodeList) {
+    public void setInitializerNodeList(List<ExpressionNode> initializerNodeList) {
         this.initializerNodeList = initializerNodeList;
     }
 }

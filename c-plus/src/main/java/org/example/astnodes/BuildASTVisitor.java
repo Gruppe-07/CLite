@@ -72,17 +72,33 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
     public DeclarationNode visitDeclaration(CLiteParser.DeclarationContext ctx) {
         DeclarationNode declarationNode = new DeclarationNode();
-
-        TypeSpecifierNode typeSpecifierNode = new TypeSpecifierNode(ctx.typeSpecifier().getText());
-        IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
-
         if (ctx.Const() != null) { declarationNode.setConst(true); }
+
         declarationNode.setTypeSpecifierNode(new TypeSpecifierNode(ctx.typeSpecifier().getText()));
 
+        List<ExpressionNode> initializerList;
         if (ctx.initializer() != null) {
-            visitInitializer(ctx.initializer());
+            initializerList = visitInitializer(ctx.initializer());
+            declarationNode.setInitializerNodeList(initializerList);
         }
-        return new DeclarationNode();
+
+
+        return declarationNode;
+    }
+
+    @Override
+    public List<ExpressionNode> visitInitializer(CLiteParser.InitializerContext ctx) {
+        List<ExpressionNode> expressionNodeList = new ArrayList<>();
+        if (ctx.assignmentExpression() != null) {
+            expressionNodeList.add(visitAssignmentExpression(ctx.assignmentExpression()));
+            return expressionNodeList;
+        }
+        else {
+            for (ParseTree child : ctx.children) {
+                expressionNodeList.add(visitInitializer(child));
+            }
+        }
+
     }
 
     @Override

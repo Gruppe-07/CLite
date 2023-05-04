@@ -112,16 +112,7 @@ grammar CLite;
 
     initializer
         :   assignmentExpression
-        |   '{' initializerList ','? '}'
-        ;
-
-    initializerList
-        :   initializer (',' initializer)*
-        ;
-
-
-    specifierQualifierList
-        :   (typeSpecifier| 'const' ) specifierQualifierList?
+        |   '{' assignmentExpression (',' assignmentExpression)* '}'
         ;
 
     statement
@@ -160,8 +151,8 @@ grammar CLite;
         ;
 
     jumpStatement
-        :   'return' expression?
-        ';'
+        :   'return' expression? ';'
+        |   'return' '(' expression (',' expression)* ')' ';'
         ;
 
     forCondition
