@@ -8,4 +8,8 @@ public class FunctionCallNode extends ExpressionNode {
         this.name = name;
         this.callValue = callValue;
     }
+
+    public FunctionCallNode(IdentifierNode name) {
+        this.name = name;
+    }
 }

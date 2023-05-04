@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
-
     @Override
     public AstNode visitCompilationUnit(CLiteParser.CompilationUnitContext ctx) {
         if (ctx.translationUnit() != null)
@@ -21,7 +20,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     public TranslationUnitNode visitTranslationUnit(CLiteParser.TranslationUnitContext ctx) {
         List<ExternalDeclarationNode> externalDeclarationNodeList = new ArrayList<>();
         for (ParseTree child : ctx.children) {
-             externalDeclarationNodeList.add(visitExternalDeclaration((CLiteParser.ExternalDeclarationContext) child));
+            externalDeclarationNodeList.add(visitExternalDeclaration((CLiteParser.ExternalDeclarationContext) child));
         }
         return new TranslationUnitNode(externalDeclarationNodeList);
     }
@@ -32,7 +31,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             return new ExternalDeclarationNode(visitDeclaration(ctx.declaration()));
         else if (ctx.functionDefinition() != null)
             return new ExternalDeclarationNode(visitFunctionDefinition(ctx.functionDefinition()));
-       return null;
+        return null;
     }
 
     @Override
@@ -337,9 +336,12 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
     public FunctionCallNode visitFunctionCall(CLiteParser.FunctionCallContext ctx) {
         IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
-        ExpressionNode callValue = visitAssignmentExpression(ctx.assignmentExpression());
+        if (ctx.assignmentExpression() != null) {
+            ExpressionNode callValue = visitAssignmentExpression(ctx.assignmentExpression());
+            return new FunctionCallNode(identifierNode, callValue);
 
-        return new FunctionCallNode(identifierNode, callValue);
+        }
+        return new FunctionCallNode(identifierNode);
     }
 
     @Override
@@ -398,3 +400,5 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
 
 }
+
+

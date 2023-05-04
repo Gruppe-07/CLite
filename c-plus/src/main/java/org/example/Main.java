@@ -28,6 +28,7 @@ public class Main {
             CLiteParser parser = new CLiteParser(tokenStream);
             ParseTree cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
             AstNode ast = new BuildASTVisitor().visitCompilationUnit((CLiteParser.CompilationUnitContext) cst);
+            System.out.println(ast);
 
         } catch (IOException e) {
             e.printStackTrace();
