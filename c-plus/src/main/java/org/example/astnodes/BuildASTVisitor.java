@@ -56,6 +56,10 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     public CompoundStatementNode visitCompoundStatement(CLiteParser.CompoundStatementContext ctx) {
         List<BlockItemNode> blockItemList = new ArrayList<>();
 
+        if (ctx.blockItemList() == null) {
+            return new CompoundStatementNode(blockItemList);
+        }
+
         for(CLiteParser.BlockItemContext blockItemContext : ctx.blockItemList().blockItem()) {
             if(blockItemContext.statement() != null) {
                 BlockItemNode blockItemNode = visitStatement(blockItemContext.statement());

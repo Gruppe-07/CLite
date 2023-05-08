@@ -1,6 +1,4 @@
-int a;
-
 function main(int a) {
-    a + b;
-
+    a+b;
+    foreach (int i in a) {}
 }
