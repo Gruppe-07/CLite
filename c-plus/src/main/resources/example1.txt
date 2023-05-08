@@ -1,5 +1,6 @@
-function main(int a) {
-    !(a + b);
 
-    return a;
+
+function main(int a) {
+     if (1 == 1) {} else {}
+
 }

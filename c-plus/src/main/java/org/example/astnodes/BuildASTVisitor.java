@@ -247,7 +247,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 }
             }
 
-
             return new AdditiveExpressionNode(operands, operators);
         }
         return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));
@@ -382,17 +381,16 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public ExpressionNode visitIncrementDecrement(CLiteParser.IncrementDecrementContext ctx) {
-
         if (ctx.Constant() != null) {
             ConstantNode constantNode;
             String str = ctx.Constant().getText();
             try {
-                double d = Double.parseDouble(str);
-                constantNode = new FloatConstantNode(d);
+                int i = Integer.parseInt(str);
+                constantNode = new IntegerConstantNode(i);
             } catch (NumberFormatException e1) {
                 try {
-                    int i = Integer.parseInt(str);
-                    constantNode = new IntegerConstantNode(i);
+                    double d = Double.parseDouble(str);
+                    constantNode = new FloatConstantNode(d);
                 } catch (NumberFormatException e2) {
                     constantNode = new CharacterConstantNode(str);
                 }
@@ -401,20 +399,18 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 return new PostFixExpressionNode(constantNode, "++");
             } else if (ctx.MinusMinus() != null) {
                 return new PostFixExpressionNode(constantNode, "--");
+            } else {
+                return constantNode;
             }
-            else {return constantNode;}
-
-        }
-
-        else if (ctx.Identifier() != null) {
+        } else if (ctx.Identifier() != null) {
             IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
-
             if (ctx.PlusPlus() != null) {
                 return new PostFixExpressionNode(identifierNode, "++");
             } else if (ctx.MinusMinus() != null) {
                 return new PostFixExpressionNode(identifierNode, "--");
+            } else {
+                return identifierNode;
             }
-            else {return identifierNode;}
         }
         return null;
     }

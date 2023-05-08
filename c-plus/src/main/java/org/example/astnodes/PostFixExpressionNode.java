@@ -8,5 +8,13 @@ public class PostFixExpressionNode extends UnaryExpressionNode {
         this.identifierOrConstant = identifierOrConstant;
         this.operator = operator;
     }
+
+    public ExpressionNode getIdentifierOrConstant() {
+        return identifierOrConstant;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
 }
 

@@ -185,6 +185,17 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitIfElseNode(IfElseNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getCondition());
+        visitCompoundStatementNode(node.getIfBranch());
+
+        if (node.getElseBranch() != null) {
+            visitCompoundStatementNode(node.getElseBranch());
+        }
+
+        dedent();
     }
 
     @Override
@@ -269,6 +280,13 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitPostFixExpressionNode(PostFixExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getIdentifierOrConstant());
+        System.out.println(getIndentString() + "Operator: " + node.getOperator());
+
+        dedent();
     }
 
     @Override
