@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class TupleNode extends ExpressionNode {
@@ -15,5 +17,9 @@ public class TupleNode extends ExpressionNode {
 
     public void setValues(List<ExpressionNode> values) {
         this.values = values;
+    }
+
+    public void accept(AstVisitor visitor){
+        visitor.visitTupleNode(this);
     }
 }

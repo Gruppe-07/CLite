@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class IdentifierNode extends ExpressionNode {
     public String name;
     public IdentifierNode(String name) {
@@ -15,4 +17,8 @@ public class IdentifierNode extends ExpressionNode {
     }
 
 
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitIdentifierNode(this);
+    }
 }

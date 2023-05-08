@@ -9,6 +9,8 @@ public class PrettyPrinter extends AstVisitor{
 
     }
 
+
+
     @Override
     public void visitArrayDeclarationNode(ArrayDeclarationNode node) {
 
@@ -120,6 +122,11 @@ public class PrettyPrinter extends AstVisitor{
     }
 
     @Override
+    public void visitInitializerNode(InitializerNode node) {
+
+    }
+
+    @Override
     public void visitPostFixExpressionNode(PostFixExpressionNode node) {
 
     }
@@ -150,9 +157,10 @@ public class PrettyPrinter extends AstVisitor{
     }
 
     @Override
-    public void visitUnaryExpressionNode(UnaryExpressionNode node) {
+    public void visitTupleNode(TupleNode node) {
 
     }
+
 
     @Override
     public void visitVariableDeclarationNode(VariableDeclarationNode node) {

@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class FloatConstantNode extends ConstantNode {
     public double value;
 
@@ -13,5 +15,9 @@ public class FloatConstantNode extends ConstantNode {
 
     public void setValue(double value) {
         this.value = value;
+    }
+
+    public void accept(AstVisitor visitor) {
+        visitor.visitFloatConstantNode(this);
     }
 }

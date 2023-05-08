@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class FunctionCallNode extends ExpressionNode {
     public IdentifierNode name;
     public ExpressionNode callValue;
@@ -11,5 +13,10 @@ public class FunctionCallNode extends ExpressionNode {
 
     public FunctionCallNode(IdentifierNode name) {
         this.name = name;
+    }
+
+
+    public void accept(AstVisitor visitor) {
+        visitor.visitFunctionCallNode(this);
     }
 }

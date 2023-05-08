@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class ForEachLoopNode extends StatementNode {
     public TypeSpecifierNode typeSpecifierNode;
     public IdentifierNode elementIdentifierNode;
@@ -45,5 +47,10 @@ public class ForEachLoopNode extends StatementNode {
 
     public void setBody(CompoundStatementNode body) {
         this.body = body;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitForEachLoopNode(this);
     }
 }

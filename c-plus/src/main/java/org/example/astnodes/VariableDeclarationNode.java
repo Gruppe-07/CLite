@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class VariableDeclarationNode extends DeclarationNode {
     public Boolean isConst;
     public TypeSpecifierNode type;
@@ -36,5 +38,9 @@ public class VariableDeclarationNode extends DeclarationNode {
 
     public void setConst(Boolean aConst) {
         isConst = aConst;
+    }
+
+    public void accept(AstVisitor visitor){
+        visitor.visitVariableDeclarationNode(this);
     }
 }

@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class InitializerNode extends AstNode {
@@ -11,5 +13,10 @@ public class InitializerNode extends AstNode {
 
     public List<ExpressionNode> getExpressionNodeList() {
         return expressionNodeList;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitInitializerNode(this);
     }
 }

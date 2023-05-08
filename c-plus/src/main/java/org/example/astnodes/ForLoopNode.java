@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class ForLoopNode extends StatementNode {
     private DeclarationNode initialization;
     private ExpressionNode condition;
@@ -36,6 +38,11 @@ public class ForLoopNode extends StatementNode {
 
     public void setBody(CompoundStatementNode body) {
         this.body = body;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitForLoopNode(this);
     }
 }
 

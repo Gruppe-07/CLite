@@ -6,6 +6,7 @@ public abstract class AstVisitor {
     public abstract void visitAdditiveExpressionNode(AdditiveExpressionNode node);
     public abstract void visitArrayDeclarationNode(ArrayDeclarationNode node);
     public abstract void visitArrayIndexNode(ArrayIndexNode node);
+    public abstract void visitInitializerNode(InitializerNode node);
     public abstract void visitAssignmentNode(AssignmentNode node);
     public abstract void visitCharacterConstantNode(CharacterConstantNode node);
     public abstract void visitCompoundStatementNode(CompoundStatementNode node);
@@ -32,7 +33,7 @@ public abstract class AstVisitor {
     public abstract void visitTranslationUnitNode(TranslationUnitNode node);
     public abstract void visitTupleDeclarationNode(TupleDeclarationNode node);
     public abstract void visitTypeSpecifierNode(TypeSpecifierNode node);
-    public abstract void visitUnaryExpressionNode(UnaryExpressionNode node);
+    public abstract void visitTupleNode(TupleNode node);
     public abstract void visitVariableDeclarationNode(VariableDeclarationNode node);
     public abstract void visitWhileLoopNode(WhileLoopNode node);
 
@@ -42,6 +43,7 @@ public abstract class AstVisitor {
     //public abstract void visitConstantNode(ConstantNode node);
     //public abstract void visitExpressionNode(ExpressionNode node);
     //public abstract void visitStatementNode(StatementNode node);
+    //public abstract void visitUnaryExpressionNode(UnaryExpressionNode node);
 
 
 }

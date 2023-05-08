@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class ParameterDeclarationNode extends DeclarationNode {
     public TypeSpecifierNode type;
     public IdentifierNode name;
@@ -23,5 +25,9 @@ public class ParameterDeclarationNode extends DeclarationNode {
 
     public void setName(IdentifierNode name) {
         this.name = name;
+    }
+
+    public void accept(AstVisitor visitor){
+        visitor.visitParameterDeclarationNode(this);
     }
 }

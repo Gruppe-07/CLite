@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
-public abstract class UnaryExpressionNode extends ExpressionNode {
+import org.example.AstVisitor;
 
+public abstract class UnaryExpressionNode extends ExpressionNode {
+    abstract void accept(AstVisitor visitor);
 }
