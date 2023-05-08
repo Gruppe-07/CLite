@@ -12,7 +12,6 @@ public class PrettyPrinter extends AstVisitor{
         indent();
 
         for (ExpressionNode expressionNode : node.getOperands()) {
-            System.out.println(getIndentString() + "Operand: " + expressionNode.getClass().getSimpleName());
             visitExpressionNode(expressionNode);
         }
 
@@ -72,6 +71,7 @@ public class PrettyPrinter extends AstVisitor{
                 if (blockItemNode instanceof IfElseNode) {
                     visitIfElseNode((IfElseNode) blockItemNode);
                 }
+
             }
         }
     dedent();
@@ -107,6 +107,14 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitEqualityExpressionNode(EqualityExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        for (ExpressionNode expressionNode : node.getOperands()) {
+            visitExpressionNode(expressionNode);
+        }
+
+        dedent();
     }
 
     @Override
@@ -187,21 +195,51 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        for (ExpressionNode expressionNode : node.getOperands()) {
+            visitExpressionNode(expressionNode);
+        }
+
+        dedent();
     }
 
     @Override
     public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        for (ExpressionNode expressionNode : node.getOperands()) {
+            visitExpressionNode(expressionNode);
+        }
+
+        dedent();
     }
 
     @Override
     public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        for (ExpressionNode expressionNode : node.getOperands()) {
+            visitExpressionNode(expressionNode);
+        }
+
+        dedent();
     }
 
     @Override
     public void visitNegationNode(NegationNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getInnerExpressionNode());
+
+        dedent();
     }
 
     @Override
@@ -220,6 +258,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitParensExpressionNode(ParensExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getInnerExpressionNode());
+
+        dedent();
     }
 
     @Override
@@ -230,11 +274,25 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitRelationalExpressionNode(RelationalExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        for (ExpressionNode expressionNode : node.getOperands()) {
+            visitExpressionNode(expressionNode);
+        }
+
+        dedent();
     }
 
     @Override
     public void visitReturnStatementNode(ReturnStatementNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getReturnValue());
+
+        dedent();
     }
 
     @Override
@@ -300,8 +358,6 @@ public class PrettyPrinter extends AstVisitor{
 
     @Override
     public void visitExpressionNode(ExpressionNode node) {
-        //System.out.println(getIndentString() + "ExpressionNode debug");
-        //System.out.println(getIndentString() + node.getClass().getSimpleName());
         if (node instanceof ConstantNode) {
             visitConstantNode((ConstantNode) node);
         } else if (node instanceof AssignmentExpressionNode) {
@@ -322,6 +378,10 @@ public class PrettyPrinter extends AstVisitor{
             visitRelationalExpressionNode((RelationalExpressionNode) node);
         } else if (node instanceof AdditiveExpressionNode) {
             visitAdditiveExpressionNode((AdditiveExpressionNode) node);
+        } else if (node instanceof IdentifierNode) {
+            visitIdentifierNode((IdentifierNode) node);
+        } else if (node instanceof EqualityExpressionNode) {
+            visitEqualityExpressionNode((EqualityExpressionNode) node);
         }
     }
 

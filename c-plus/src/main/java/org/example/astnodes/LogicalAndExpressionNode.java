@@ -9,4 +9,12 @@ public class LogicalAndExpressionNode extends ExpressionNode {
         Operands = operands;
         Operators = operators;
     }
+
+    public List<ExpressionNode> getOperands() {
+        return Operands;
+    }
+
+    public List<String> getOperators() {
+        return Operators;
+    }
 }

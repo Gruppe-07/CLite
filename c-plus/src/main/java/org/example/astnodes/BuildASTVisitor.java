@@ -247,8 +247,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 }
             }
 
-            System.out.println(new AdditiveExpressionNode(operands, operators).getOperands());
-            System.out.println(new AdditiveExpressionNode(operands, operators).getOperators());
+
             return new AdditiveExpressionNode(operands, operators);
         }
         return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));
@@ -416,9 +415,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 return new PostFixExpressionNode(identifierNode, "--");
             }
             else {return identifierNode;}
-
         }
-
         return null;
     }
 

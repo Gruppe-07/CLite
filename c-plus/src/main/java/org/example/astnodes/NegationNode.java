@@ -6,4 +6,8 @@ public class NegationNode extends UnaryExpressionNode {
     public NegationNode(ExpressionNode innerExpressionNode) {
         this.innerExpressionNode = innerExpressionNode;
     }
+
+    public ExpressionNode getInnerExpressionNode() {
+        return innerExpressionNode;
+    }
 }

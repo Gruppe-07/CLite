@@ -6,4 +6,8 @@ public class ParensExpressionNode extends ExpressionNode{
     public ParensExpressionNode(ExpressionNode innerExpressionNode) {
         this.innerExpressionNode = innerExpressionNode;
     }
+
+    public ExpressionNode getInnerExpressionNode() {
+        return innerExpressionNode;
+    }
 }
