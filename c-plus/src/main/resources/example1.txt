@@ -1,4 +1,3 @@
 function main(int a) {
     a+b;
-    foreach (int i in a) {}
 }

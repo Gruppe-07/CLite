@@ -12,6 +12,7 @@ public class PrettyPrinter extends AstVisitor{
         indent();
 
         for (ExpressionNode expressionNode : node.getOperands()) {
+            System.out.println(getIndentString() + "Operand: " + expressionNode.getClass().getSimpleName());
             visitExpressionNode(expressionNode);
         }
 
@@ -132,6 +133,16 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitForEachLoopNode(ForEachLoopNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitTypeSpecifierNode(node.getTypeSpecifierNode());
+
+        visitIdentifierNode(node.getElementIdentifier());
+        visitIdentifierNode(node.getArrayIdentifier());
+        visitCompoundStatementNode(node.getBody());
+
+        dedent();
     }
 
     @Override

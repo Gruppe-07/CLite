@@ -214,14 +214,18 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             List<ExpressionNode> operands = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.UnaryExpressionContext){
-                    operands.add(visitUnaryExpression((CLiteParser.UnaryExpressionContext) child));
+            for (CLiteParser.UnaryExpressionContext unaryExpressionContext : ctx.unaryExpression()) {
+                if (unaryExpressionContext != null) {
+                    operands.add(visitUnaryExpression(unaryExpressionContext));
                 }
-                else {
+            }
+
+            for (ParseTree child: ctx.children) {
+                if (child instanceof TerminalNode) {
                     operators.add(child.getText());
                 }
             }
+
             return new MultiplicativeExpressionNode(operands, operators);
         }
         return visitUnaryExpression(ctx.unaryExpression(0));
@@ -237,14 +241,14 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
                 operands.add(visitMultiplicativeExpression(multiplicativeExpressionContext));
             }
 
-            for (TerminalNode operator :  ctx.Minus()) {
-                operators.add(operator.getText());
+            for (ParseTree child: ctx.children) {
+                if (child instanceof TerminalNode) {
+                    operators.add(child.getText());
+                }
             }
 
-            for (TerminalNode operator :  ctx.Plus()) {
-                operators.add(operator.getText());
-            }
-
+            System.out.println(new AdditiveExpressionNode(operands, operators).getOperands());
+            System.out.println(new AdditiveExpressionNode(operands, operators).getOperators());
             return new AdditiveExpressionNode(operands, operators);
         }
         return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));
@@ -337,13 +341,15 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         if (ctx.postfixExpression() != null) {
             return visitPostfixExpression(ctx.postfixExpression());
         }
-        if (ctx.unaryOperator() != null && ctx.multiplicativeExpression() != null){
+        else if (ctx.unaryOperator() != null && ctx.multiplicativeExpression() != null){
             return new NegationNode(visitMultiplicativeExpression(ctx.multiplicativeExpression()));
         }
         else {
             throw new RuntimeException("Unknown statement type: " + ctx.getText());
         }
     }
+
+
 
     @Override
     public ExpressionNode visitPostfixExpression(CLiteParser.PostfixExpressionContext ctx) {
@@ -376,22 +382,43 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     @Override
-    public PostFixExpressionNode visitIncrementDecrement(CLiteParser.IncrementDecrementContext ctx) {
-        if (ctx.Constant() != null) {
-            String str = ctx.Constant().getText();
+    public ExpressionNode visitIncrementDecrement(CLiteParser.IncrementDecrementContext ctx) {
 
+        if (ctx.Constant() != null) {
+            ConstantNode constantNode;
+            String str = ctx.Constant().getText();
             try {
                 double d = Double.parseDouble(str);
-                return new PostFixExpressionNode(new FloatConstantNode(d), ctx.children.get(1).getText());
+                constantNode = new FloatConstantNode(d);
             } catch (NumberFormatException e1) {
                 try {
                     int i = Integer.parseInt(str);
-                    return new PostFixExpressionNode(new IntegerConstantNode(i), ctx.children.get(1).getText());
+                    constantNode = new IntegerConstantNode(i);
                 } catch (NumberFormatException e2) {
-                    return new PostFixExpressionNode(new CharacterConstantNode(str), ctx.children.get(1).getText());
+                    constantNode = new CharacterConstantNode(str);
                 }
             }
+            if (ctx.PlusPlus() != null) {
+                return new PostFixExpressionNode(constantNode, "++");
+            } else if (ctx.MinusMinus() != null) {
+                return new PostFixExpressionNode(constantNode, "--");
+            }
+            else {return constantNode;}
+
         }
+
+        else if (ctx.Identifier() != null) {
+            IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
+
+            if (ctx.PlusPlus() != null) {
+                return new PostFixExpressionNode(identifierNode, "++");
+            } else if (ctx.MinusMinus() != null) {
+                return new PostFixExpressionNode(identifierNode, "--");
+            }
+            else {return identifierNode;}
+
+        }
+
         return null;
     }
 
