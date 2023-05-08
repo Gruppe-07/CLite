@@ -1,3 +1,5 @@
+int a;
+
 function main(int a) {
     a + b;
 

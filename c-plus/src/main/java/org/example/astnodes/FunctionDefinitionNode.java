@@ -10,6 +10,18 @@ public class FunctionDefinitionNode extends AstNode {
         this.parameter = parameter;
         this.body = body;
     }
+
+    public IdentifierNode getName() {
+        return name;
+    }
+
+    public ParameterDeclarationNode getParameter() {
+        return parameter;
+    }
+
+    public CompoundStatementNode getBody() {
+        return body;
+    }
 }
 
 

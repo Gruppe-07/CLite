@@ -5,4 +5,8 @@ public class ExpressionStatementNode extends StatementNode {
     public ExpressionStatementNode(ExpressionNode expressionNode) {
         this.expressionNode = expressionNode;
     }
+
+    public ExpressionNode getExpressionNode() {
+        return expressionNode;
+    }
 }

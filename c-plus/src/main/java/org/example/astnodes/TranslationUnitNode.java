@@ -8,5 +8,9 @@ public class TranslationUnitNode extends AstNode {
     public TranslationUnitNode(List<ExternalDeclarationNode> externalDeclarationNodeList) {
         this.externalDeclarationNodeList = externalDeclarationNodeList;
     }
+
+    public List<ExternalDeclarationNode> getExternalDeclarationNodeList() {
+        return externalDeclarationNodeList;
+    }
 }
 

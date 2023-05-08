@@ -3,13 +3,14 @@ package org.example.astnodes;
 import com.myparser.parser.CLiteParser;
 import com.myparser.parser.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
-    public AstNode visitCompilationUnit(CLiteParser.CompilationUnitContext ctx) {
+    public TranslationUnitNode visitCompilationUnit(CLiteParser.CompilationUnitContext ctx) {
         if (ctx.translationUnit() != null)
             return visitTranslationUnit(ctx.translationUnit());
         else
@@ -55,14 +56,14 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     public CompoundStatementNode visitCompoundStatement(CLiteParser.CompoundStatementContext ctx) {
         List<BlockItemNode> blockItemList = new ArrayList<>();
 
-        for(ParseTree child : ctx.blockItemList().children) {
-            if(child instanceof CLiteParser.StatementContext) {
-                BlockItemNode blockItemNode = visitStatement((CLiteParser.StatementContext) child);
+        for(CLiteParser.BlockItemContext blockItemContext : ctx.blockItemList().blockItem()) {
+            if(blockItemContext.statement() != null) {
+                BlockItemNode blockItemNode = visitStatement(blockItemContext.statement());
                 blockItemList.add(blockItemNode);
             }
 
-            else if (child instanceof CLiteParser.DeclarationContext) {
-                BlockItemNode blockItemNode = visitDeclaration((CLiteParser.DeclarationContext) child);
+            else if(blockItemContext.declaration() != null) {
+                BlockItemNode blockItemNode = visitDeclaration(blockItemContext.declaration());
                 blockItemList.add(blockItemNode);
             }
         }
@@ -73,6 +74,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     public DeclarationNode visitDeclaration(CLiteParser.DeclarationContext ctx) {
         DeclarationNode declarationNode = new DeclarationNode();
         if (ctx.Const() != null) { declarationNode.setConst(true); }
+        else {declarationNode.setConst(false);}
 
         declarationNode.setTypeSpecifierNode(new TypeSpecifierNode(ctx.typeSpecifier().getText()));
 
@@ -115,7 +117,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         ExpressionNode left = visitUnaryExpression(ctx.unaryExpression());
         ExpressionNode right = visitAssignmentExpression(ctx.assignmentExpression());
 
-        return new AssignmentNode(left, right);
+        return new AssignmentExpressionNode(left, right);
     }
 
     @Override
@@ -152,7 +154,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     }
 
     @Override
-    public StatementNode visitExpressionStatement(CLiteParser.ExpressionStatementContext ctx) {
+    public ExpressionStatementNode visitExpressionStatement(CLiteParser.ExpressionStatementContext ctx) {
         return new ExpressionStatementNode(visitExpression(ctx.expression()));
     }
 
@@ -227,14 +229,18 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             List<ExpressionNode> operands = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.MultiplicativeExpressionContext){
-                    operands.add(visitMultiplicativeExpression((CLiteParser.MultiplicativeExpressionContext) child));
-                }
-                else {
-                    operators.add(child.getText());
-                }
+            for (CLiteParser.MultiplicativeExpressionContext multiplicativeExpressionContext : ctx.multiplicativeExpression()) {
+                operands.add(visitMultiplicativeExpression(multiplicativeExpressionContext));
             }
+
+            for (TerminalNode operator :  ctx.Minus()) {
+                operators.add(operator.getText());
+            }
+
+            for (TerminalNode operator :  ctx.Plus()) {
+                operators.add(operator.getText());
+            }
+
             return new AdditiveExpressionNode(operands, operators);
         }
         return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));

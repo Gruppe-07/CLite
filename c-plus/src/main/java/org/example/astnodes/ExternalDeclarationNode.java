@@ -5,4 +5,8 @@ public class ExternalDeclarationNode extends AstNode {
     public ExternalDeclarationNode(AstNode funcDefOrDecl) {
         this.funcDefOrDecl = funcDefOrDecl;
     }
+
+    public AstNode getFuncDefOrDecl() {
+        return funcDefOrDecl;
+    }
 }
