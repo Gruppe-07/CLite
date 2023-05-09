@@ -1,4 +1,6 @@
 package org.example.astnodes;
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class RelationalExpressionNode extends ExpressionNode {
@@ -16,5 +18,10 @@ public class RelationalExpressionNode extends ExpressionNode {
 
     public List<String> getOperators() {
         return Operators;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitRelationalExpressionNode(this);
     }
 }

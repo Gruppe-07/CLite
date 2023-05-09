@@ -56,7 +56,7 @@ grammar CLite;
         ;
 
     functionCall
-        : Identifier '(' assignmentExpression? ')'
+        : Identifier '(' expression? ')'
         ;
     incrementDecrement
         : (Identifier | Constant) ('++' | '--')?

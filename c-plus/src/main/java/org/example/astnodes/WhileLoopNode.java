@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class WhileLoopNode extends StatementNode {
     private ExpressionNode condition;
     private CompoundStatementNode body;
@@ -16,5 +18,10 @@ public class WhileLoopNode extends StatementNode {
 
     public CompoundStatementNode getBody() {
         return body;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitWhileLoopNode(this);
     }
 }

@@ -4,8 +4,7 @@ import org.example.astnodes.*;
 
 public abstract class AstVisitor {
     public abstract void visitAdditiveExpressionNode(AdditiveExpressionNode node);
-
-    public abstract void visitAssignmentNode(AssignmentExpressionNode node);
+    public abstract void visitAssignmentExpressionNode(AssignmentExpressionNode node);
     public abstract void visitCharacterConstantNode(CharacterConstantNode node);
     public abstract void visitCompoundStatementNode(CompoundStatementNode node);
     public abstract void visitDeclarationNode(DeclarationNode node);
@@ -32,15 +31,14 @@ public abstract class AstVisitor {
     public abstract void visitUnaryExpressionNode(UnaryExpressionNode node);
     public abstract void visitWhileLoopNode(WhileLoopNode node);
     public abstract void visitExpressionStatementNode(ExpressionStatementNode node);
-    public abstract void visitInitializerNode(InitializerNode node);
     public abstract void visitExpressionNode(ExpressionNode node);
     public abstract void visitConstantNode(ConstantNode node);
+
 
     //Abstract Nodes
     //public abstract void visitAstNode(AstNode node);
     //public abstract void visitBlockItemNode(BlockItemNode node);
     //public abstract void visitConstantNode(ConstantNode node);
-    //public abstract void visitExpressionNode(ExpressionNode node);
     //public abstract void visitStatementNode(StatementNode node);
 
 

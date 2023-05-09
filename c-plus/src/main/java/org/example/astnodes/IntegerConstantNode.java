@@ -19,6 +19,9 @@ public class IntegerConstantNode extends ConstantNode {
     }
 
 
-
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitIntegerConstantNode(this);
+    }
 }
 

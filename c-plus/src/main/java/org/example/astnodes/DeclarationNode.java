@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class DeclarationNode extends BlockItemNode {
@@ -38,6 +40,11 @@ public class DeclarationNode extends BlockItemNode {
 
     public void setValue(ExpressionNode value) {
         this.value = value;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitDeclarationNode(this);
     }
 }
 

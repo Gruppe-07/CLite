@@ -313,8 +313,8 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
     public FunctionCallNode visitFunctionCall(CLiteParser.FunctionCallContext ctx) {
         IdentifierNode identifierNode = new IdentifierNode(ctx.Identifier().getText());
-        if (ctx.assignmentExpression() != null) {
-            ExpressionNode callValue = visitAssignmentExpression(ctx.assignmentExpression());
+        if (ctx.expression() != null) {
+            ExpressionNode callValue = visitExpression(ctx.expression());
             return new FunctionCallNode(identifierNode, callValue);
 
         }

@@ -1,4 +1,6 @@
 package org.example.astnodes;
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class MultiplicativeExpressionNode extends ExpressionNode {
@@ -16,6 +18,11 @@ public class MultiplicativeExpressionNode extends ExpressionNode {
 
     public List<String> getOperators() {
         return Operators;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitMultiplicativeExpressionNode(this);
     }
 }
 

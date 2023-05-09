@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class PostFixExpressionNode extends UnaryExpressionNode {
     public ExpressionNode identifierOrConstant;
     public String operator;
@@ -15,6 +17,11 @@ public class PostFixExpressionNode extends UnaryExpressionNode {
 
     public String getOperator() {
         return operator;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitPostFixExpressionNode(this);
     }
 }
 

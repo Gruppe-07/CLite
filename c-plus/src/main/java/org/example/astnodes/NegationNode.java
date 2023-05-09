@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class NegationNode extends UnaryExpressionNode {
     public ExpressionNode innerExpressionNode;
 
@@ -9,5 +11,10 @@ public class NegationNode extends UnaryExpressionNode {
 
     public ExpressionNode getInnerExpressionNode() {
         return innerExpressionNode;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitNegationNode(this);
     }
 }

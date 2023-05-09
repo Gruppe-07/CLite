@@ -1,4 +1,6 @@
 package org.example.astnodes;
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class EqualityExpressionNode extends ExpressionNode {
@@ -16,6 +18,11 @@ public class EqualityExpressionNode extends ExpressionNode {
 
     public List<String> getOperators() {
         return Operators;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitEqualityExpressionNode(this);
     }
 }
 

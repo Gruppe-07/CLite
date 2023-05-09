@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 import java.util.List;
 
 public class ReturnStatementNode extends StatementNode {
@@ -19,6 +21,11 @@ public class ReturnStatementNode extends StatementNode {
 
     public void setReturnValue(ExpressionNode returnValue) {
         this.returnValue = returnValue;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitReturnStatementNode(this);
     }
 }
 

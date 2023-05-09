@@ -1,5 +1,7 @@
 package org.example.astnodes;
 
+import org.example.AstVisitor;
+
 public class IfElseNode extends StatementNode {
     public ExpressionNode condition;
     public CompoundStatementNode ifBranch;
@@ -42,4 +44,8 @@ public class IfElseNode extends StatementNode {
     }
 
 
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visitIfElseNode(this);
+    }
 }

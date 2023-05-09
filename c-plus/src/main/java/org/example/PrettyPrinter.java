@@ -19,8 +19,15 @@ public class PrettyPrinter extends AstVisitor{
     }
 
     @Override
-    public void visitAssignmentNode(AssignmentExpressionNode node) {
+    public void visitAssignmentExpressionNode(AssignmentExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitExpressionNode(node.getLeft());
+        visitExpressionNode(node.getRight());
+
+        dedent();
     }
 
     @Override
@@ -35,33 +42,10 @@ public class PrettyPrinter extends AstVisitor{
         indent();
 
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
-
-            if (blockItemNode instanceof DeclarationNode) {
-                visitDeclarationNode((DeclarationNode) blockItemNode);
-            } else if (blockItemNode instanceof StatementNode) {
-
-                if (blockItemNode instanceof ReturnStatementNode) {
-                    visitReturnStatementNode((ReturnStatementNode) blockItemNode);
-                }
-                if (blockItemNode instanceof ForLoopNode) {
-                    visitForLoopNode((ForLoopNode) blockItemNode);
-                }
-                if (blockItemNode instanceof ExpressionStatementNode) {
-                    visitExpressionStatementNode((ExpressionStatementNode) blockItemNode);
-                }
-                if (blockItemNode instanceof WhileLoopNode) {
-                    visitWhileLoopNode((WhileLoopNode) blockItemNode);
-                }
-                if (blockItemNode instanceof CompoundStatementNode) {
-                    visitCompoundStatementNode((CompoundStatementNode) blockItemNode);
-                }
-                if (blockItemNode instanceof IfElseNode) {
-                    visitIfElseNode((IfElseNode) blockItemNode);
-                }
-
-            }
+            blockItemNode.accept(this);
         }
-    dedent();
+
+        dedent();
     }
 
     @Override
@@ -107,12 +91,7 @@ public class PrettyPrinter extends AstVisitor{
         System.out.println(getIndentString() + node.getClass().getSimpleName());
         indent();
 
-        if (node.getFuncDefOrDecl() instanceof FunctionDefinitionNode) {
-            visitFunctionDefinitionNode((FunctionDefinitionNode) node.getFuncDefOrDecl());
-        }
-        else if (node.getFuncDefOrDecl() instanceof DeclarationNode) {
-            visitDeclarationNode((DeclarationNode) node.getFuncDefOrDecl());
-        }
+        node.getFuncDefOrDecl().accept(this);
 
         dedent();;
     }
@@ -335,56 +314,12 @@ public class PrettyPrinter extends AstVisitor{
 
     @Override
     public void visitExpressionNode(ExpressionNode node) {
-        if (node instanceof ConstantNode) {
-            visitConstantNode((ConstantNode) node);
-        } else if (node instanceof AssignmentExpressionNode) {
-            visitAssignmentNode((AssignmentExpressionNode) node);
-        } else if (node instanceof LogicalAndExpressionNode) {
-            visitLogicalAndExpressionNode((LogicalAndExpressionNode) node);
-        } else if (node instanceof LogicalOrExpressionNode) {
-            visitLogicalOrExpressionNode((LogicalOrExpressionNode) node);
-        } else if (node instanceof MultiplicativeExpressionNode) {
-            visitMultiplicativeExpressionNode((MultiplicativeExpressionNode) node);
-        } else if (node instanceof NegationNode) {
-            visitNegationNode((NegationNode) node);
-        } else if (node instanceof ParensExpressionNode) {
-            visitParensExpressionNode((ParensExpressionNode) node);
-        } else if (node instanceof PostFixExpressionNode) {
-            visitPostFixExpressionNode((PostFixExpressionNode) node);
-        } else if (node instanceof RelationalExpressionNode) {
-            visitRelationalExpressionNode((RelationalExpressionNode) node);
-        } else if (node instanceof AdditiveExpressionNode) {
-            visitAdditiveExpressionNode((AdditiveExpressionNode) node);
-        } else if (node instanceof IdentifierNode) {
-            visitIdentifierNode((IdentifierNode) node);
-        } else if (node instanceof EqualityExpressionNode) {
-            visitEqualityExpressionNode((EqualityExpressionNode) node);
-        } else if (node instanceof FunctionCallNode) {
-            visitFunctionCallNode((FunctionCallNode) node);
-        }
-    }
-
-    @Override
-    public void visitInitializerNode(InitializerNode node) {
-        System.out.println(getIndentString() + node.getClass().getSimpleName());
-
-        indent();
-        for (ExpressionNode expressionNode : node.getExpressionNodeList()) {
-            visitExpressionNode(expressionNode);
-        }
-
-        dedent();
+        node.accept(this);
     }
 
     @Override
     public void visitConstantNode(ConstantNode node) {
-        if (node instanceof IntegerConstantNode) {
-            visitIntegerConstantNode((IntegerConstantNode) node);
-        } else if (node instanceof CharacterConstantNode) {
-            visitCharacterConstantNode((CharacterConstantNode) node);
-        } else if (node instanceof FloatConstantNode) {
-            visitFloatConstantNode((FloatConstantNode) node);
-        }
+        node.accept(this);
     }
 
     private void indent() {
