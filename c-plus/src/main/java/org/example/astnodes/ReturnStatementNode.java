@@ -9,6 +9,9 @@ public class ReturnStatementNode extends StatementNode {
         this.returnValue = returnValue;
     }
 
+    public ReturnStatementNode() {
+    }
+
 
     public ExpressionNode getReturnValue() {
         return returnValue;

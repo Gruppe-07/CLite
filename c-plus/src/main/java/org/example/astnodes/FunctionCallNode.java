@@ -12,4 +12,12 @@ public class FunctionCallNode extends ExpressionNode {
     public FunctionCallNode(IdentifierNode name) {
         this.name = name;
     }
+
+    public IdentifierNode getName() {
+        return name;
+    }
+
+    public ExpressionNode getCallValue() {
+        return callValue;
+    }
 }

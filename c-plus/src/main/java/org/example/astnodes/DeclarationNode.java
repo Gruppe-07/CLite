@@ -5,43 +5,39 @@ import java.util.List;
 public class DeclarationNode extends BlockItemNode {
     public Boolean isConst;
     public TypeSpecifierNode typeSpecifierNode;
-    public List<IdentifierNode> declaratorNodeList;
-    public InitializerNode initializerNode;
-
-    public DeclarationNode() {
-    }
+    public IdentifierNode identifierNode;
+    public ExpressionNode value;
 
     public Boolean getConst() {
         return isConst;
+    }
+
+    public TypeSpecifierNode getTypeSpecifierNode() {
+        return typeSpecifierNode;
+    }
+
+    public IdentifierNode getIdentifierNode() {
+        return identifierNode;
+    }
+
+    public ExpressionNode getValue() {
+        return value;
     }
 
     public void setConst(Boolean aConst) {
         isConst = aConst;
     }
 
-
-    public TypeSpecifierNode getTypeSpecifierNode() {
-        return typeSpecifierNode;
-    }
-
     public void setTypeSpecifierNode(TypeSpecifierNode typeSpecifierNode) {
         this.typeSpecifierNode = typeSpecifierNode;
     }
 
-    public InitializerNode getInitializerNode() {
-        return initializerNode;
+    public void setIdentifierNode(IdentifierNode identifierNode) {
+        this.identifierNode = identifierNode;
     }
 
-    public void setInitializerNode(InitializerNode initializerNode) {
-        this.initializerNode = initializerNode;
-    }
-
-    public List<IdentifierNode> getDeclaratorNodeList() {
-        return declaratorNodeList;
-    }
-
-    public void setDeclaratorNodeList(List<IdentifierNode> declaratorNodeList) {
-        this.declaratorNodeList = declaratorNodeList;
+    public void setValue(ExpressionNode value) {
+        this.value = value;
     }
 }
 

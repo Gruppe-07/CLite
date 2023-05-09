@@ -1,6 +1,7 @@
-
-
 function main(int a) {
-     if (1 == 1) {} else {}
+
+1 + 1 == 2 + 3 * (1 + 2);
+
+int a = f(1 + 1);
 
 }

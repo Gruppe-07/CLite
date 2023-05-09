@@ -31,7 +31,6 @@ public class Main {
             TranslationUnitNode ast = new BuildASTVisitor().visitCompilationUnit(cst);
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             prettyPrinter.visitTranslationUnitNode(ast);
-            //System.out.println(ast);
 
         } catch (IOException e) {
             e.printStackTrace();

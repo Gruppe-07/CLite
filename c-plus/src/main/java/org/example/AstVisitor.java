@@ -4,8 +4,7 @@ import org.example.astnodes.*;
 
 public abstract class AstVisitor {
     public abstract void visitAdditiveExpressionNode(AdditiveExpressionNode node);
-    public abstract void visitArrayDeclarationNode(ArrayDeclarationNode node);
-    public abstract void visitArrayIndexNode(ArrayIndexNode node);
+
     public abstract void visitAssignmentNode(AssignmentExpressionNode node);
     public abstract void visitCharacterConstantNode(CharacterConstantNode node);
     public abstract void visitCompoundStatementNode(CompoundStatementNode node);
@@ -13,7 +12,6 @@ public abstract class AstVisitor {
     public abstract void visitEqualityExpressionNode(EqualityExpressionNode node);
     public abstract void visitExternalDeclarationNode(ExternalDeclarationNode node);
     public abstract void visitFloatConstantNode(FloatConstantNode node);
-    public abstract void visitForEachLoopNode(ForEachLoopNode node);
     public abstract void visitForLoopNode(ForLoopNode node);
     public abstract void visitFunctionCallNode(FunctionCallNode node);
     public abstract void visitFunctionDefinitionNode(FunctionDefinitionNode node);
@@ -30,10 +28,8 @@ public abstract class AstVisitor {
     public abstract void visitRelationalExpressionNode(RelationalExpressionNode node);
     public abstract void visitReturnStatementNode(ReturnStatementNode node);
     public abstract void visitTranslationUnitNode(TranslationUnitNode node);
-    public abstract void visitTupleDeclarationNode(TupleDeclarationNode node);
     public abstract void visitTypeSpecifierNode(TypeSpecifierNode node);
     public abstract void visitUnaryExpressionNode(UnaryExpressionNode node);
-    public abstract void visitVariableDeclarationNode(VariableDeclarationNode node);
     public abstract void visitWhileLoopNode(WhileLoopNode node);
     public abstract void visitExpressionStatementNode(ExpressionStatementNode node);
     public abstract void visitInitializerNode(InitializerNode node);

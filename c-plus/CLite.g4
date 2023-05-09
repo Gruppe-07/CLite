@@ -47,17 +47,12 @@ grammar CLite;
 
     postfixExpression
         : parensExpression
-        | arrayIndex
         | functionCall
         | incrementDecrement
         ;
 
     parensExpression
         : '(' expression ')'
-        ;
-
-    arrayIndex
-        : Identifier  '[' expression ']'
         ;
 
     functionCall
@@ -101,19 +96,12 @@ grammar CLite;
         |   'int'
         |   'double'
         |   'string'
-        |   'array' ('<'typeSpecifier'>')?
-        |   'tuple'
         ;
 
     declaration
-        :   ('const')? typeSpecifier Identifier (',' Identifier)* ('=' initializer)? ';'
+        :   ('const')? typeSpecifier Identifier '=' expression ';'
         ;
 
-
-    initializer
-        :   assignmentExpression
-        |   '{' assignmentExpression (',' assignmentExpression)* '}'
-        ;
 
     statement
         :   compoundStatement
@@ -146,18 +134,11 @@ grammar CLite;
 
     iterationStatement
         :   While '(' expression ')' compoundStatement
-        |   For '(' forCondition ')' compoundStatement
-        |   Foreach '(' typeSpecifier Identifier 'in' Identifier ')' compoundStatement
         ;
 
     jumpStatement
         :   'return' expression? ';'
-        |   'return' '(' expression (',' expression)* ')' ';'
         ;
-
-    forCondition
-    	:   declaration relationalExpression ';' postfixExpression
-    	;
 
 
 
@@ -165,8 +146,6 @@ grammar CLite;
     Function : 'function';
     Int : 'int';
     Double : 'double';
-    Tuple : 'tuple';
-    Array : 'array';
     String : 'string';
     If : 'if';
     Return : 'return';
@@ -206,8 +185,6 @@ grammar CLite;
 
     Equal : '==';
     NotEqual : '!=';
-
-    Dot : '.';
 
     Identifier
         :   IdentifierNondigit
