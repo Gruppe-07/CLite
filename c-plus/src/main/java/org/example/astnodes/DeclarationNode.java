@@ -46,11 +46,6 @@ public class DeclarationNode extends BlockItemNode {
     public void accept(AstVisitor visitor) {
         visitor.visitDeclarationNode(this);
     }
-
-    @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitDeclarationNode(this);
-    }
 }
 
 

@@ -36,8 +36,8 @@ public class Main {
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             prettyPrinter.visitTranslationUnitNode(ast);
 
-            ScopeChecker scopeChecker = new ScopeChecker(new SymbolTable());
-            scopeChecker.visitTranslationUnitNode(ast);
+            //ScopeChecker scopeChecker = new ScopeChecker(new SymbolTable());
+            //scopeChecker.visitTranslationUnitNode(ast);
 
 
 

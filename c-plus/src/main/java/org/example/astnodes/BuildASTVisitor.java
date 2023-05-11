@@ -113,7 +113,6 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public StatementNode visitStatement(CLiteParser.StatementContext ctx) {
-        //ctx.getChild(0).accept(this);
         if (ctx.compoundStatement() != null) {
             return visitCompoundStatement(ctx.compoundStatement());
         } else if (ctx.expressionStatement() != null) {

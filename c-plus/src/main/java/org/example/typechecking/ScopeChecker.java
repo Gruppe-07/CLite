@@ -9,9 +9,6 @@ import org.example.typechecking.symbols.Symbol;
 public class ScopeChecker extends AstVisitor {
     private SymbolTable currentSymbolTable;
     private Scope currentScope;
-    public ScopeChecker(SymbolTable symbolTable) {
-        this.symbolTable = symbolTable;
-    }
 
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
@@ -69,26 +66,6 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
 
-        String parameterType = node.getParameter().getType().getType();
-
-        Type type = Type.valueOf(parameterType.toUpperCase());
-
-        String identifier = node.getParameter().getIdentifierNode().getName();
-
-        ParameterSymbol parameterSymbol = new ParameterSymbol(identifier, type);
-
-        FunctionSymbol functionSymbol = new FunctionSymbol(node.getName().getName(), parameterSymbol);
-
-        this.getSymbolTable()
-        Scope functionScope = new Scope(this.getCurrentScope(), this.symbolTable);
-        this.setCurrentScope(functionScope);
-
-
-        this.getCurrentScope().addSymbol(identifier, parameterSymbol);
-
-        this.setCurrentScope(this.getCurrentScope().getParentScope());
-
-        node.getBody().accept(this);
     }
 
     @Override
@@ -200,7 +177,4 @@ public class ScopeChecker extends AstVisitor {
         this.currentScope = currentScope;
     }
 
-    public SymbolTable getSymbolTable() {
-        return symbolTable;
-    }
 }
