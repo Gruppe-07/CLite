@@ -2,16 +2,20 @@ package org.example.typechecking;
 
 import org.example.typechecking.symbols.Symbol;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
-    private Map<String, Symbol> symbols;
+    private final Map<String, Symbol> symbols;
     private final SymbolTable parent;
+    private final List<SymbolTable> children;
 
     public SymbolTable(SymbolTable parent) {
         this.symbols = new HashMap<>();
         this.parent = parent;
+        this.children = new ArrayList<>();
     }
 
     public void addSymbol(String name, Symbol symbol) {
@@ -30,20 +34,24 @@ public class SymbolTable {
     }
 
     public SymbolTable enterScope() {
-        return new SymbolTable(this);
+        SymbolTable childScope = new SymbolTable(this);
+        children.add(childScope);
+        return childScope;
     }
 
     public SymbolTable getParent() {
         return parent;
     }
 
+    public List<SymbolTable> getChildren() {
+        return children;
+    }
+
     @Override
     public String toString() {
         return "SymbolTable{" +
                 "symbols=" + symbols +
-                ", parent=" + parent +
+                ", children=" + children +
                 '}';
     }
 }
-
-

@@ -15,6 +15,7 @@ public class ScopeChecker extends AstVisitor {
 
     public void checkScope(TranslationUnitNode node) {
         visitTranslationUnitNode(node);
+        System.out.println(getCurrentScope().toString());
     }
 
 
@@ -38,13 +39,9 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitCompoundStatementNode(CompoundStatementNode node) {
-        setCurrentScope(getCurrentScope().enterScope());
-
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             blockItemNode.accept(this);
         }
-
-        setCurrentScope(getCurrentScope().getParent());
     }
 
     @Override
@@ -90,8 +87,8 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitFunctionCallNode(FunctionCallNode node) {
-        System.out.println(getCurrentScope().toString());
-        String name = node.getName().getName();
+
+        String name = node.getIdentifierNode().getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
             throw new RuntimeException(name + " is not a defined function.");
@@ -111,33 +108,36 @@ public class ScopeChecker extends AstVisitor {
     public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String functionName = node.getIdentifierNode().getName();
 
-        //If function definition has a parameter
+        if (getCurrentScope().lookupSymbol(functionName) != null) {
+            throw new RuntimeException("Variable: " + functionName + " already declared");
+        }
+
+        VariableSymbol paramSymbol = null;
         if (node.getParameter() != null) {
-            if (getCurrentScope().lookupSymbol(functionName) == null) {
-                String paramName = node.getParameter().getName().getName();
-                Type parmType = Type.valueOf(node.getParameter().getType().getType().toUpperCase());
+            String paramName = node.getParameter().getName().getName();
+            Type parmType = Type.valueOf(node.getParameter().getType().getType().toUpperCase());
 
-                VariableSymbol paramSymbol = new VariableSymbol(paramName, parmType);
-                FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, paramSymbol);
-                getCurrentScope().addSymbol(functionName, funcSymbol);
-            }
-            else throw new RuntimeException("Variable: " + functionName + " name already declared");
-        }
-        else
-        //If function definition does not have a parameter
-        {
-            if (getCurrentScope().lookupSymbol(functionName) == null) {
+            paramSymbol = new VariableSymbol(paramName, parmType);
 
-                FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION);
-                getCurrentScope().addSymbol(functionName, funcSymbol);
+            if (getCurrentScope().lookupSymbol(paramName) != null) {
+                throw new RuntimeException("Variable: " + paramName + " already declared");
             }
-            else throw new RuntimeException("Variable: " + functionName + " name already declared");
         }
 
+        FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, paramSymbol);
+        getCurrentScope().addSymbol(functionName, funcSymbol);
 
+        setCurrentScope(getCurrentScope().enterScope());
+
+        if (paramSymbol != null) {
+            getCurrentScope().addSymbol(paramSymbol.getName(), paramSymbol);
+        }
 
         node.getBody().accept(this);
+
+        setCurrentScope(getCurrentScope().getParent());
     }
+
 
     @Override
     public void visitIdentifierNode(IdentifierNode node) {

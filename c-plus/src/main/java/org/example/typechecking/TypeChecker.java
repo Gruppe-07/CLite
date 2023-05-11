@@ -4,6 +4,16 @@ import org.example.AstVisitor;
 import org.example.astnodes.*;
 
 public class TypeChecker extends AstVisitor {
+    private int scopeLevel = 0;
+    private SymbolTable symbolTable;
+    public TypeChecker(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
+    }
+
+    public void checkTypes(TranslationUnitNode node) {
+        visitTranslationUnitNode(node);
+    }
+
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
 
@@ -21,7 +31,21 @@ public class TypeChecker extends AstVisitor {
 
     @Override
     public void visitCompoundStatementNode(CompoundStatementNode node) {
+        incrementScope();
 
+        //setSymbolTable(getSymbolTable().getChildren());
+        //getSymbolTable()
+
+        decrementScope();
+
+    }
+
+    private void decrementScope() {
+        scopeLevel--;
+    }
+
+    private void incrementScope() {
+        scopeLevel++;
     }
 
     @Override
@@ -37,6 +61,7 @@ public class TypeChecker extends AstVisitor {
 
     @Override
     public void visitExternalDeclarationNode(ExternalDeclarationNode node) {
+
         node.getFuncDefOrDecl().accept(this);
     }
 
@@ -52,6 +77,10 @@ public class TypeChecker extends AstVisitor {
 
     @Override
     public void visitFunctionCallNode(FunctionCallNode node) {
+        String funcName = node.getIdentifierNode().getName();
+
+        //symbolTable.
+
 
     }
 
@@ -156,5 +185,13 @@ public class TypeChecker extends AstVisitor {
     @Override
     public void visitConstantNode(ConstantNode node) {
 
+    }
+
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+
+    public void setSymbolTable(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
     }
 }
