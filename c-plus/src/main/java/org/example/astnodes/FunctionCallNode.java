@@ -15,7 +15,15 @@ public class FunctionCallNode extends ExpressionNode {
         this.name = name;
     }
 
+    public IdentifierNode getName() {
+        return name;
+    }
 
+    public ExpressionNode getCallValue() {
+        return callValue;
+    }
+
+    @Override
     public void accept(AstVisitor visitor) {
         visitor.visitFunctionCallNode(this);
     }

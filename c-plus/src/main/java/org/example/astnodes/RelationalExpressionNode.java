@@ -12,7 +12,16 @@ public class RelationalExpressionNode extends ExpressionNode {
         Operators = operators;
     }
 
-    public void accept(AstVisitor visitor){
+    public List<ExpressionNode> getOperands() {
+        return Operands;
+    }
+
+    public List<String> getOperators() {
+        return Operators;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
         visitor.visitRelationalExpressionNode(this);
     }
 }

@@ -13,6 +13,18 @@ public class FunctionDefinitionNode extends AstNode {
         this.body = body;
     }
 
+    public IdentifierNode getName() {
+        return name;
+    }
+
+    public ParameterDeclarationNode getParameter() {
+        return parameter;
+    }
+
+    public CompoundStatementNode getBody() {
+        return body;
+    }
+
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visitFunctionDefinitionNode(this);

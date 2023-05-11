@@ -8,8 +8,12 @@ public class ExpressionStatementNode extends StatementNode {
         this.expressionNode = expressionNode;
     }
 
+    public ExpressionNode getExpressionNode() {
+        return expressionNode;
+    }
+
     @Override
     public void accept(AstVisitor visitor) {
-
+        visitor.visitExpressionStatementNode(this);
     }
 }

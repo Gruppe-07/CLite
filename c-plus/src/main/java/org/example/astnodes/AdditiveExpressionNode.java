@@ -13,6 +13,14 @@ public class AdditiveExpressionNode extends ExpressionNode {
     }
 
 
+    public List<ExpressionNode> getOperands() {
+        return Operands;
+    }
+
+    public List<String> getOperators() {
+        return Operators;
+    }
+
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visitAdditiveExpressionNode(this);

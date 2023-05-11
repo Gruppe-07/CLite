@@ -11,7 +11,16 @@ public class PostFixExpressionNode extends UnaryExpressionNode {
         this.operator = operator;
     }
 
-    public void accept(AstVisitor visitor){
+    public ExpressionNode getIdentifierOrConstant() {
+        return identifierOrConstant;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
         visitor.visitPostFixExpressionNode(this);
     }
 }

@@ -13,6 +13,7 @@ public class TypeSpecifierNode extends AstNode {
         return type;
     }
 
+
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visitTypeSpecifierNode(this);

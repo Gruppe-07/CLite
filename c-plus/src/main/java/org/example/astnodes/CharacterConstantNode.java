@@ -18,7 +18,8 @@ public class CharacterConstantNode extends ConstantNode {
         this.value = value;
     }
 
+    @Override
     public void accept(AstVisitor visitor) {
-        visitor.visitCharacterConstantNode(this);
+        visitor.visitConstantNode(this);
     }
 }

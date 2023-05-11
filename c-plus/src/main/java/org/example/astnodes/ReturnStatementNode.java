@@ -11,6 +11,9 @@ public class ReturnStatementNode extends StatementNode {
         this.returnValue = returnValue;
     }
 
+    public ReturnStatementNode() {
+    }
+
 
     public ExpressionNode getReturnValue() {
         return returnValue;
@@ -20,7 +23,8 @@ public class ReturnStatementNode extends StatementNode {
         this.returnValue = returnValue;
     }
 
-    public void accept(AstVisitor visitor){
+    @Override
+    public void accept(AstVisitor visitor) {
         visitor.visitReturnStatementNode(this);
     }
 }

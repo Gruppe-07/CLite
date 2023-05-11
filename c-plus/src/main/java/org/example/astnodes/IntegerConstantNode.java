@@ -19,12 +19,7 @@ public class IntegerConstantNode extends ConstantNode {
     }
 
 
-    /*@Override
-    public <T> T accept(AstVisitor<T> visitor) {
-        return visitor.visit(this);
-    }*/
-
-
+    @Override
     public void accept(AstVisitor visitor) {
         visitor.visitIntegerConstantNode(this);
     }

@@ -27,7 +27,8 @@ public class ParameterDeclarationNode extends DeclarationNode {
         this.name = name;
     }
 
-    public void accept(AstVisitor visitor){
+    @Override
+    public void accept(AstVisitor visitor) {
         visitor.visitParameterDeclarationNode(this);
     }
 }

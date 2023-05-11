@@ -11,6 +11,7 @@ import com.myparser.parser.CLiteLexer;
 import com.myparser.parser.CLiteParser;
 import org.example.astnodes.AstNode;
 import org.example.astnodes.BuildASTVisitor;
+import org.example.astnodes.TranslationUnitNode;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,10 +27,10 @@ public class Main {
             CLiteLexer lexer = new CLiteLexer(charStream);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             CLiteParser parser = new CLiteParser(tokenStream);
-            ParseTree cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
-            AstNode ast = new BuildASTVisitor().visitCompilationUnit((CLiteParser.CompilationUnitContext) cst);
-
-            System.out.println(ast);
+            CLiteParser.CompilationUnitContext cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
+            TranslationUnitNode ast = new BuildASTVisitor().visitCompilationUnit(cst);
+            PrettyPrinter prettyPrinter = new PrettyPrinter();
+            prettyPrinter.visitTranslationUnitNode(ast);
 
         } catch (IOException e) {
             e.printStackTrace();

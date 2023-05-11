@@ -11,7 +11,6 @@ public class CompoundStatementNode extends StatementNode {
         this.blockItemList = blockItemList;
     }
 
-
     public List<BlockItemNode> getBlockItemNodeList() {
         return blockItemList;
     }

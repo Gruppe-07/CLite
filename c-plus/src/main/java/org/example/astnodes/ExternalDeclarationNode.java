@@ -8,6 +8,10 @@ public class ExternalDeclarationNode extends AstNode {
         this.funcDefOrDecl = funcDefOrDecl;
     }
 
+    public AstNode getFuncDefOrDecl() {
+        return funcDefOrDecl;
+    }
+
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visitExternalDeclarationNode(this);

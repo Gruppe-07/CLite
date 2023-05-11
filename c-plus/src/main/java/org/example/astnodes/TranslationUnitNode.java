@@ -11,8 +11,12 @@ public class TranslationUnitNode extends AstNode {
         this.externalDeclarationNodeList = externalDeclarationNodeList;
     }
 
+    public List<ExternalDeclarationNode> getExternalDeclarationNodeList() {
+        return externalDeclarationNodeList;
+    }
+
     @Override
-    void accept(AstVisitor visitor) {
+    public void accept(AstVisitor visitor) {
         visitor.visitTranslationUnitNode(this);
     }
 }

@@ -9,7 +9,12 @@ public class ParensExpressionNode extends ExpressionNode{
         this.innerExpressionNode = innerExpressionNode;
     }
 
-    public void accept(AstVisitor visitor){
+    public ExpressionNode getInnerExpressionNode() {
+        return innerExpressionNode;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
         visitor.visitParensExpressionNode(this);
     }
 }

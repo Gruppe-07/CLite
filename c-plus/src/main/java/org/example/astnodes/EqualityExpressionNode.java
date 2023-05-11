@@ -12,8 +12,16 @@ public class EqualityExpressionNode extends ExpressionNode {
         Operators = operators;
     }
 
+    public List<ExpressionNode> getOperands() {
+        return Operands;
+    }
+
+    public List<String> getOperators() {
+        return Operators;
+    }
+
     @Override
-    void accept(AstVisitor visitor) {
+    public void accept(AstVisitor visitor) {
         visitor.visitEqualityExpressionNode(this);
     }
 }
