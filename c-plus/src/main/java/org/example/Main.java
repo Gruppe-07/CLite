@@ -12,6 +12,9 @@ import com.myparser.parser.CLiteParser;
 import org.example.astnodes.AstNode;
 import org.example.astnodes.BuildASTVisitor;
 import org.example.astnodes.TranslationUnitNode;
+import org.example.typechecking.ScopeChecker;
+import org.example.typechecking.SymbolTable;
+import org.example.typechecking.TypeChecker;
 
 public class Main {
     public static void main(String[] args) {
@@ -29,8 +32,14 @@ public class Main {
             CLiteParser parser = new CLiteParser(tokenStream);
             CLiteParser.CompilationUnitContext cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
             TranslationUnitNode ast = new BuildASTVisitor().visitCompilationUnit(cst);
+
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             prettyPrinter.visitTranslationUnitNode(ast);
+
+            ScopeChecker scopeChecker = new ScopeChecker(new SymbolTable());
+            scopeChecker.visitTranslationUnitNode(ast);
+
+
 
         } catch (IOException e) {
             e.printStackTrace();

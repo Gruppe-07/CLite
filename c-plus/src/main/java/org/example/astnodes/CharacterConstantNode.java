@@ -20,6 +20,6 @@ public class CharacterConstantNode extends ConstantNode {
 
     @Override
     public void accept(AstVisitor visitor) {
-        visitor.visitConstantNode(this);
+        visitor.visitCharacterConstantNode(this);
     }
 }
