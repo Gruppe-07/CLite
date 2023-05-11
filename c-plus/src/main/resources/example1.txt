@@ -1,4 +1,8 @@
-function main() {
+function f() {}
+
+function main(int a) {
     f();
+    int i = 1;
+    i++;
 
 }

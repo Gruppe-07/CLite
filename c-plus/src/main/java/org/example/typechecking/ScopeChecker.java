@@ -2,7 +2,9 @@ package org.example.typechecking;
 
 import org.example.AstVisitor;
 import org.example.astnodes.*;
+import org.example.typechecking.symbols.FunctionDefinitionSymbol;
 import org.example.typechecking.symbols.Symbol;
+import org.example.typechecking.symbols.VariableSymbol;
 
 public class ScopeChecker extends AstVisitor {
     private SymbolTable currentScope;
@@ -51,7 +53,8 @@ public class ScopeChecker extends AstVisitor {
         Type type = Type.valueOf(node.getTypeSpecifierNode().getType().toUpperCase());
 
         if (getCurrentScope().lookupSymbol(name) == null) {
-            getCurrentScope().addSymbol(name, type);
+            VariableSymbol variableSymbol = new VariableSymbol(name, type);
+            getCurrentScope().addSymbol(name, variableSymbol);
         }
         else {throw new RuntimeException("Variable already defined");}
 
@@ -108,10 +111,30 @@ public class ScopeChecker extends AstVisitor {
     public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String functionName = node.getIdentifierNode().getName();
 
-        if (getCurrentScope().lookupSymbol(functionName) == null) {
-            getCurrentScope().addSymbol(functionName, Type.FUNCTION);
+        //If function definition has a parameter
+        if (node.getParameter() != null) {
+            if (getCurrentScope().lookupSymbol(functionName) == null) {
+                String paramName = node.getParameter().getName().getName();
+                Type parmType = Type.valueOf(node.getParameter().getType().getType().toUpperCase());
+
+                VariableSymbol paramSymbol = new VariableSymbol(paramName, parmType);
+                FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, paramSymbol);
+                getCurrentScope().addSymbol(functionName, funcSymbol);
+            }
+            else throw new RuntimeException("Variable: " + functionName + " name already declared");
         }
-        else throw new RuntimeException("Variable: " + functionName + " name already declared");
+        else
+        //If function definition does not have a parameter
+        {
+            if (getCurrentScope().lookupSymbol(functionName) == null) {
+
+                FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION);
+                getCurrentScope().addSymbol(functionName, funcSymbol);
+            }
+            else throw new RuntimeException("Variable: " + functionName + " name already declared");
+        }
+
+
 
         node.getBody().accept(this);
     }

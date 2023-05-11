@@ -2,7 +2,7 @@ package org.example.astnodes;
 
 import org.example.AstVisitor;
 
-public class ParameterDeclarationNode extends DeclarationNode {
+public class ParameterDeclarationNode extends AstNode {
     public TypeSpecifierNode type;
     public IdentifierNode name;
 

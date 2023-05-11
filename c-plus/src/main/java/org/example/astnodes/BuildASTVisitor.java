@@ -28,11 +28,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public ExternalDeclarationNode visitExternalDeclaration(CLiteParser.ExternalDeclarationContext ctx) {
-        if (ctx.declaration() != null)
-            return new ExternalDeclarationNode(visitDeclaration(ctx.declaration()));
-        else if (ctx.functionDefinition() != null)
-            return new ExternalDeclarationNode(visitFunctionDefinition(ctx.functionDefinition()));
-        return null;
+        return new ExternalDeclarationNode(ctx.getChild(0).accept(this));
     }
 
     @Override
@@ -44,7 +40,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
             return new FunctionDefinitionNode(functionIdentifierNodeNode, compoundStatementNode);
         }
         else {
-            ParameterDeclarationNode parameterDeclarationNode = new ParameterDeclarationNode();
+            ParameterDeclarationNode parameterDeclarationNode = visitParameterDeclaration(ctx.parameterDeclaration());
             CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
             return new FunctionDefinitionNode(functionIdentifierNodeNode, parameterDeclarationNode, compoundStatementNode);
         }
@@ -116,19 +112,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public StatementNode visitStatement(CLiteParser.StatementContext ctx) {
-        if (ctx.compoundStatement() != null) {
-            return visitCompoundStatement(ctx.compoundStatement());
-        } else if (ctx.expressionStatement() != null) {
-            return visitExpressionStatement(ctx.expressionStatement());
-        } else if (ctx.selectionStatement() != null) {
-            return visitSelectionStatement(ctx.selectionStatement());
-        } else if (ctx.iterationStatement() != null) {
-            return visitIterationStatement(ctx.iterationStatement());
-        } else if (ctx.jumpStatement() != null) {
-            return visitJumpStatement(ctx.jumpStatement());
-        } else {
-            throw new RuntimeException("Unknown statement type: " + ctx.getText());
-        }
+        return (StatementNode) ctx.getChild(0).accept(this);
     }
 
     @Override
@@ -299,18 +283,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public ExpressionNode visitPostfixExpression(CLiteParser.PostfixExpressionContext ctx) {
-        if (ctx.parensExpression() != null) {
-            return visitParensExpression(ctx.parensExpression());
-        }
-        if (ctx.functionCall() != null) {
-            return visitFunctionCall(ctx.functionCall());
-        }
-        if (ctx.incrementDecrement() != null) {
-            return visitIncrementDecrement(ctx.incrementDecrement());
-        }
-        else {
-            throw new RuntimeException("Unknown statement type: " + ctx.getText());
-        }
+        return (ExpressionNode) ctx.getChild(0).accept(this);
     }
 
     @Override

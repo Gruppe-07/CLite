@@ -14,8 +14,7 @@ public class SymbolTable {
         this.parent = parent;
     }
 
-    public void addSymbol(String name, Type type) {
-        Symbol symbol = new Symbol(name, type);
+    public void addSymbol(String name, Symbol symbol) {
         symbols.put(name, symbol);
     }
 

@@ -2,7 +2,7 @@ package org.example.typechecking.symbols;
 
 import org.example.typechecking.Type;
 
-public class Symbol {
+public abstract class Symbol {
     private String name;
     private Type type;
 
@@ -11,20 +11,20 @@ public class Symbol {
         this.type = type;
     }
 
-    @Override
-    public String toString() {
-        return "Symbol{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                '}';
-    }
-
     public String getName() {
         return name;
     }
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return "Symbol{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                '}';
     }
 }
 
