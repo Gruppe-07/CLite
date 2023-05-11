@@ -6,24 +6,45 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SymbolTable {
-
-    private SymbolTable parentSymbolTable;
     private Map<String, Symbol> symbols;
+    private final SymbolTable parent;
 
-    public SymbolTable() {
-        symbols = new HashMap<>();
+    public SymbolTable(SymbolTable parent) {
+        this.symbols = new HashMap<>();
+        this.parent = parent;
     }
 
-    public void addSymbol(String name, Symbol symbol) {
+    public void addSymbol(String name, Type type) {
+        Symbol symbol = new Symbol(name, type);
         symbols.put(name, symbol);
     }
 
-    public Symbol getSymbol(String name) {
-        return symbols.get(name);
+    public Symbol lookupSymbol(String name) {
+        Symbol value = symbols.get(name);
+        if (value != null) {
+            return value;
+        } else if (parent != null) {
+            return parent.lookupSymbol(name);
+        } else {
+            return null;
+        }
     }
 
-    public boolean containsSymbol(String name) {
-        return symbols.containsKey(name);
+    public SymbolTable enterScope() {
+        return new SymbolTable(this);
+    }
+
+    public SymbolTable getParent() {
+        return parent;
+    }
+
+    @Override
+    public String toString() {
+        return "SymbolTable{" +
+                "symbols=" + symbols +
+                ", parent=" + parent +
+                '}';
     }
 }
+
 

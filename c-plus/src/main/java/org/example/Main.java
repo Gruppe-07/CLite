@@ -15,6 +15,7 @@ import org.example.astnodes.TranslationUnitNode;
 import org.example.typechecking.ScopeChecker;
 import org.example.typechecking.SymbolTable;
 import org.example.typechecking.TypeChecker;
+import org.example.typechecking.UndefinedVariableException;
 
 public class Main {
     public static void main(String[] args) {
@@ -36,9 +37,8 @@ public class Main {
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             prettyPrinter.visitTranslationUnitNode(ast);
 
-            //ScopeChecker scopeChecker = new ScopeChecker(new SymbolTable());
-            //scopeChecker.visitTranslationUnitNode(ast);
-
+            ScopeChecker scopeChecker = new ScopeChecker();
+            scopeChecker.checkScope(ast);
 
 
         } catch (IOException e) {

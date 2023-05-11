@@ -38,10 +38,16 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     @Override
     public FunctionDefinitionNode visitFunctionDefinition(CLiteParser.FunctionDefinitionContext ctx) {
         IdentifierNode functionIdentifierNodeNode = new IdentifierNode(ctx.Identifier().getText());
-        ParameterDeclarationNode parameterDeclarationNode = visitParameterDeclaration(ctx.parameterDeclaration());
-        CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
 
-        return new FunctionDefinitionNode(functionIdentifierNodeNode, parameterDeclarationNode, compoundStatementNode);
+        if (ctx.parameterDeclaration() == null) {
+            CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
+            return new FunctionDefinitionNode(functionIdentifierNodeNode, compoundStatementNode);
+        }
+        else {
+            ParameterDeclarationNode parameterDeclarationNode = new ParameterDeclarationNode();
+            CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
+            return new FunctionDefinitionNode(functionIdentifierNodeNode, parameterDeclarationNode, compoundStatementNode);
+        }
     }
 
     @Override
@@ -78,10 +84,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     public DeclarationNode visitDeclaration(CLiteParser.DeclarationContext ctx) {
         DeclarationNode declarationNode = new DeclarationNode();
 
-        if (ctx.Const() != null) {
-            declarationNode.setConst(true);
-        }
-        else {declarationNode.setConst(false);}
+        declarationNode.setConst(ctx.Const() != null);
 
         declarationNode.setTypeSpecifierNode(new TypeSpecifierNode(ctx.typeSpecifier().getText()));
 

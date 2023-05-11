@@ -123,7 +123,10 @@ public class PrettyPrinter extends AstVisitor{
         indent();
 
         visitIdentifierNode(node.getName());
-        visitExpressionNode(node.getCallValue());
+
+        if (node.getCallValue() != null) {
+            visitExpressionNode(node.getCallValue());
+        }
 
         dedent();
     }
@@ -134,8 +137,8 @@ public class PrettyPrinter extends AstVisitor{
 
         indent();
 
-        visitIdentifierNode(node.getName());
-        visitParameterDeclarationNode(node.getParameter());
+        visitIdentifierNode(node.getIdentifierNode());
+        if (node.getParameter() != null) {visitParameterDeclarationNode(node.getParameter());}
         visitCompoundStatementNode(node.getBody());
 
         dedent();

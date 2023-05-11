@@ -11,6 +11,9 @@ public class ParameterDeclarationNode extends DeclarationNode {
         this.name = name;
     }
 
+    public ParameterDeclarationNode() {
+    }
+
     public TypeSpecifierNode getType() {
         return type;
     }
