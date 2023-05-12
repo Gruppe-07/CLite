@@ -4,7 +4,6 @@ import org.example.AstVisitor;
 
 public class FloatConstantNode extends ConstantNode {
     public double value;
-
     public FloatConstantNode(double value) {
         this.value = value;
     }

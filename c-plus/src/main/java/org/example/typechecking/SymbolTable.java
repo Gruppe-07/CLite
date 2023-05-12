@@ -10,12 +10,10 @@ import java.util.Map;
 public class SymbolTable {
     private final Map<String, Symbol> symbols;
     private final SymbolTable parent;
-    private final List<SymbolTable> children;
 
     public SymbolTable(SymbolTable parent) {
         this.symbols = new HashMap<>();
         this.parent = parent;
-        this.children = new ArrayList<>();
     }
 
     public void addSymbol(String name, Symbol symbol) {
@@ -34,24 +32,18 @@ public class SymbolTable {
     }
 
     public SymbolTable enterScope() {
-        SymbolTable childScope = new SymbolTable(this);
-        children.add(childScope);
-        return childScope;
+        return new SymbolTable(this);
     }
 
     public SymbolTable getParent() {
         return parent;
     }
 
-    public List<SymbolTable> getChildren() {
-        return children;
-    }
-
     @Override
     public String toString() {
         return "SymbolTable{" +
                 "symbols=" + symbols +
-                ", children=" + children +
+                ", parent=" + parent +
                 '}';
     }
 }

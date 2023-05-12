@@ -50,7 +50,9 @@ public class TypeChecker extends AstVisitor {
 
     @Override
     public void visitDeclarationNode(DeclarationNode node) {
-        String name = node.getIdentifierNode().getName();
+        String typeSpecifier = node.getTypeSpecifierNode().getType();
+        node.getValue().accept(this);
+
         //node.getTypeSpecifierNode()
     }
 

@@ -6,14 +6,21 @@ import org.example.typechecking.symbols.FunctionDefinitionSymbol;
 import org.example.typechecking.symbols.Symbol;
 import org.example.typechecking.symbols.VariableSymbol;
 
+import java.util.List;
+import java.util.Stack;
+
 public class ScopeChecker extends AstVisitor {
     private SymbolTable currentScope;
+    private Stack<SymbolTable> tableStack;
 
     public ScopeChecker() {
         this.currentScope = new SymbolTable(null);
+        this.tableStack = new Stack<>();
     }
 
     public void checkScope(TranslationUnitNode node) {
+        //Add global scope to stack
+        tableStack.push(getCurrentScope());
         visitTranslationUnitNode(node);
         System.out.println(getCurrentScope().toString());
     }
@@ -39,9 +46,16 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitCompoundStatementNode(CompoundStatementNode node) {
+        //Create and set new scope and add scope to stack
+        setCurrentScope(getCurrentScope().enterScope());
+        tableStack.push(getCurrentScope());
+
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             blockItemNode.accept(this);
         }
+
+        //Exit scope
+        setCurrentScope(getCurrentScope().getParent());
     }
 
     @Override
@@ -108,10 +122,12 @@ public class ScopeChecker extends AstVisitor {
     public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String functionName = node.getIdentifierNode().getName();
 
+        //Throw an error if function name has already been declared
         if (getCurrentScope().lookupSymbol(functionName) != null) {
             throw new RuntimeException("Variable: " + functionName + " already declared");
         }
 
+        //Create parameter symbol if function has parameter
         VariableSymbol paramSymbol = null;
         if (node.getParameter() != null) {
             String paramName = node.getParameter().getName().getName();
@@ -127,13 +143,23 @@ public class ScopeChecker extends AstVisitor {
         FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, paramSymbol);
         getCurrentScope().addSymbol(functionName, funcSymbol);
 
+        visitFunctionBody(node.getBody(), paramSymbol);
+
+    }
+
+    public void visitFunctionBody(CompoundStatementNode node, VariableSymbol paramSymbol) {
         setCurrentScope(getCurrentScope().enterScope());
+        tableStack.push(getCurrentScope());
 
         if (paramSymbol != null) {
             getCurrentScope().addSymbol(paramSymbol.getName(), paramSymbol);
         }
 
-        node.getBody().accept(this);
+        getCurrentScope().addSymbol(paramSymbol.getName(), paramSymbol);
+
+        for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
+            blockItemNode.accept(this);
+        }
 
         setCurrentScope(getCurrentScope().getParent());
     }

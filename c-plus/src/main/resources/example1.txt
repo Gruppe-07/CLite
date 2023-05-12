@@ -1,7 +1,7 @@
-function f(int a) {}
+function f(int b) {}
 
-int a = 10;
+int b = 10 + 10;
 
-function main(int b) {
+function main(double a) {
     f(a);
 }
