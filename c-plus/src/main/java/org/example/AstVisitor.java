@@ -11,7 +11,7 @@ public abstract class AstVisitor {
     public abstract void visitEqualityExpressionNode(EqualityExpressionNode node);
     public abstract void visitExternalDeclarationNode(ExternalDeclarationNode node);
     public abstract void visitFloatConstantNode(FloatConstantNode node);
-    public abstract void visitForLoopNode(ForLoopNode node);
+    //public abstract void visitForLoopNode(ForLoopNode node);
     public abstract void visitFunctionCallNode(FunctionCallNode node);
     public abstract void visitFunctionDefinitionNode(FunctionDefinitionNode node);
     public abstract void visitIdentifierNode(IdentifierNode node);

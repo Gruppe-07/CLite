@@ -150,8 +150,6 @@ grammar CLite;
     If : 'if';
     Return : 'return';
     While : 'while';
-    For   : 'for';
-    Foreach   : 'foreach';
     Else : 'else';
 
     LeftParen : '(';
@@ -229,7 +227,7 @@ grammar CLite;
     Constant
         :   IntegerConstant
         |   FloatingConstant
-        |   CharacterConstant
+        //|   CharacterConstant
         ;
 
     fragment

@@ -40,9 +40,6 @@ public class Main {
             ScopeChecker scopeChecker = new ScopeChecker();
             scopeChecker.checkScope(ast);
 
-            TypeChecker typeChecker = new TypeChecker(scopeChecker.getCurrentScope());
-            typeChecker.checkTypes(ast);
-
 
         } catch (IOException e) {
             e.printStackTrace();

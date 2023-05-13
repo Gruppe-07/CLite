@@ -10,19 +10,36 @@ import java.util.List;
 import java.util.Stack;
 
 public class ScopeChecker extends AstVisitor {
-    private SymbolTable currentScope;
-    private Stack<SymbolTable> tableStack;
+    private final Stack<SymbolTable> tableStack;
+    private Type currentType;
 
     public ScopeChecker() {
-        this.currentScope = new SymbolTable(null);
         this.tableStack = new Stack<>();
+        //Add global scope to stack
+        tableStack.push(new SymbolTable(null));
     }
 
+    public void enterScope() {
+        tableStack.push(new SymbolTable(tableStack.peek()));
+    }
+
+    public void exitScope() {
+        tableStack.pop();
+    }
+
+    public SymbolTable getCurrentScope() {
+        return tableStack.peek();
+    }
+
+    public void setCurrentType(Type type) {
+        this.currentType = type;
+    }
+
+    public Type getCurrentType() {
+        return this.currentType;
+    }
     public void checkScope(TranslationUnitNode node) {
-        //Add global scope to stack
-        tableStack.push(getCurrentScope());
         visitTranslationUnitNode(node);
-        System.out.println(getCurrentScope().toString());
     }
 
 
@@ -41,21 +58,20 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitCharacterConstantNode(CharacterConstantNode node) {
-
+        if (getCurrentType() != Type.STRING) {
+            throw new RuntimeException("Operand does not match type: " + getCurrentType());
+        }
     }
 
     @Override
     public void visitCompoundStatementNode(CompoundStatementNode node) {
-        //Create and set new scope and add scope to stack
-        setCurrentScope(getCurrentScope().enterScope());
-        tableStack.push(getCurrentScope());
+        enterScope();
 
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             blockItemNode.accept(this);
         }
 
-        //Exit scope
-        setCurrentScope(getCurrentScope().getParent());
+        exitScope();
     }
 
     @Override
@@ -63,13 +79,17 @@ public class ScopeChecker extends AstVisitor {
         String name = node.getIdentifierNode().getName();
         Type type = Type.valueOf(node.getTypeSpecifierNode().getType().toUpperCase());
 
+        setCurrentType(type);
+
+        node.getValue().accept(this);
+
         if (getCurrentScope().lookupSymbol(name) == null) {
             VariableSymbol variableSymbol = new VariableSymbol(name, type);
             getCurrentScope().addSymbol(name, variableSymbol);
         }
         else {throw new RuntimeException("Variable already defined");}
 
-        node.getValue().accept(this);
+
     }
 
     @Override
@@ -86,18 +106,11 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitFloatConstantNode(FloatConstantNode node) {
-
+        if (getCurrentType() != Type.DOUBLE) {
+            throw new RuntimeException("Operand does not match type: " + getCurrentType());
+        }
     }
 
-    @Override
-    public void visitForLoopNode(ForLoopNode node) {
-
-        node.getInitialization().accept(this);
-        node.getCondition().accept(this);
-        node.getUpdate().accept(this);
-        node.getBody().accept(this);
-
-    }
 
     @Override
     public void visitFunctionCallNode(FunctionCallNode node) {
@@ -148,20 +161,17 @@ public class ScopeChecker extends AstVisitor {
     }
 
     public void visitFunctionBody(CompoundStatementNode node, VariableSymbol paramSymbol) {
-        setCurrentScope(getCurrentScope().enterScope());
-        tableStack.push(getCurrentScope());
+        enterScope();
 
         if (paramSymbol != null) {
             getCurrentScope().addSymbol(paramSymbol.getName(), paramSymbol);
         }
 
-        getCurrentScope().addSymbol(paramSymbol.getName(), paramSymbol);
-
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             blockItemNode.accept(this);
         }
 
-        setCurrentScope(getCurrentScope().getParent());
+        exitScope();
     }
 
 
@@ -187,7 +197,9 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitIntegerConstantNode(IntegerConstantNode node) {
-
+        if (getCurrentType() != Type.INT) {
+            throw new RuntimeException("Operand does not match type: " + getCurrentType());
+        }
     }
 
     @Override
@@ -283,13 +295,5 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitConstantNode(ConstantNode node) {
 
-    }
-
-    public SymbolTable getCurrentScope() {
-        return currentScope;
-    }
-
-    public void setCurrentScope(SymbolTable currentScope) {
-        this.currentScope = currentScope;
     }
 }
