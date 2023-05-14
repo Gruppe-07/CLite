@@ -89,7 +89,7 @@ public class ScopeChecker extends AstVisitor {
         }
         else {throw new RuntimeException("Variable already defined");}
 
-
+        setCurrentType(null);
     }
 
     @Override
@@ -181,6 +181,12 @@ public class ScopeChecker extends AstVisitor {
 
         if (getCurrentScope().lookupSymbol(name) == null) {
             throw new RuntimeException("Variable \"" + name + "\" is undefined.");
+        }
+
+        if (getCurrentType() == null) {
+            Symbol symbol = getCurrentScope().lookupSymbol(name);
+            Type thisType = symbol.getType();
+            setCurrentType(thisType);
         }
     }
 

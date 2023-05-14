@@ -5,17 +5,12 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 
 import com.myparser.parser.CLiteLexer;
 import com.myparser.parser.CLiteParser;
-import org.example.astnodes.AstNode;
 import org.example.astnodes.BuildASTVisitor;
 import org.example.astnodes.TranslationUnitNode;
 import org.example.typechecking.ScopeChecker;
-import org.example.typechecking.SymbolTable;
-import org.example.typechecking.TypeChecker;
-import org.example.typechecking.UndefinedVariableException;
 
 public class Main {
     public static void main(String[] args) {

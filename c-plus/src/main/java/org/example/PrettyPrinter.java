@@ -103,20 +103,6 @@ public class PrettyPrinter extends AstVisitor{
 
 
     @Override
-    public void visitForLoopNode(ForLoopNode node) {
-        System.out.println(getIndentString() + node.getClass().getSimpleName());
-
-        indent();
-
-        visitDeclarationNode(node.getInitialization());
-        visitExpressionNode(node.getCondition());
-        visitExpressionNode(node.getUpdate());
-        visitCompoundStatementNode(node.getBody());
-
-        dedent();
-    }
-
-    @Override
     public void visitFunctionCallNode(FunctionCallNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
@@ -335,9 +321,7 @@ public class PrettyPrinter extends AstVisitor{
 
     private String getIndentString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < indentLevel; i++) {
-            sb.append("  ");
-        }
+        sb.append("  ".repeat(Math.max(0, indentLevel)));
         return sb.toString();
     }
 }
