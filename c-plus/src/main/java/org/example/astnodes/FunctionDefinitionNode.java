@@ -3,20 +3,24 @@ package org.example.astnodes;
 import org.example.AstVisitor;
 
 public class FunctionDefinitionNode extends AstNode {
+    public TypeSpecifierNode typeSpecifierNode;
     public IdentifierNode identifierNode;
     public ParameterDeclarationNode parameter;
     public CompoundStatementNode body;
 
-    public FunctionDefinitionNode(IdentifierNode identifierNode, ParameterDeclarationNode parameter, CompoundStatementNode body) {
+    public FunctionDefinitionNode(TypeSpecifierNode typeSpecifierNode, IdentifierNode identifierNode, ParameterDeclarationNode parameter, CompoundStatementNode body) {
+        this.typeSpecifierNode = typeSpecifierNode;
         this.identifierNode = identifierNode;
         this.parameter = parameter;
         this.body = body;
     }
 
-    public FunctionDefinitionNode(IdentifierNode identifierNode, CompoundStatementNode body) {
+    public FunctionDefinitionNode(TypeSpecifierNode typeSpecifierNode, IdentifierNode identifierNode, CompoundStatementNode body) {
+        this.typeSpecifierNode = typeSpecifierNode;
         this.identifierNode = identifierNode;
         this.body = body;
     }
+
 
     public IdentifierNode getIdentifierNode() {
         return identifierNode;
@@ -33,6 +37,10 @@ public class FunctionDefinitionNode extends AstNode {
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visitFunctionDefinitionNode(this);
+    }
+
+    public TypeSpecifierNode getTypeSpecifierNode() {
+        return typeSpecifierNode;
     }
 }
 

@@ -87,7 +87,7 @@ grammar CLite;
         ;
 
     functionDefinition
-        :   Function Identifier '(' parameterDeclaration? ')' compoundStatement
+        :   typeSpecifier Identifier '(' parameterDeclaration? ')' compoundStatement
         ;
 
     typeSpecifier

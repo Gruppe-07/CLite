@@ -33,16 +33,17 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public FunctionDefinitionNode visitFunctionDefinition(CLiteParser.FunctionDefinitionContext ctx) {
-        IdentifierNode functionIdentifierNodeNode = new IdentifierNode(ctx.Identifier().getText());
+        TypeSpecifierNode functionTypeSpecifierNode = new TypeSpecifierNode(ctx.typeSpecifier().getText());
+        IdentifierNode functionIdentifierNode = new IdentifierNode(ctx.Identifier().getText());
 
         if (ctx.parameterDeclaration() == null) {
             CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
-            return new FunctionDefinitionNode(functionIdentifierNodeNode, compoundStatementNode);
+            return new FunctionDefinitionNode(functionTypeSpecifierNode, functionIdentifierNode, compoundStatementNode);
         }
         else {
             ParameterDeclarationNode parameterDeclarationNode = visitParameterDeclaration(ctx.parameterDeclaration());
             CompoundStatementNode compoundStatementNode = visitCompoundStatement(ctx.compoundStatement());
-            return new FunctionDefinitionNode(functionIdentifierNodeNode, parameterDeclarationNode, compoundStatementNode);
+            return new FunctionDefinitionNode(functionTypeSpecifierNode ,functionIdentifierNode, parameterDeclarationNode, compoundStatementNode);
         }
     }
 

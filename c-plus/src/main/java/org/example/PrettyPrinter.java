@@ -123,6 +123,7 @@ public class PrettyPrinter extends AstVisitor{
 
         indent();
 
+        visitTypeSpecifierNode(node.getTypeSpecifierNode());
         visitIdentifierNode(node.getIdentifierNode());
         if (node.getParameter() != null) {visitParameterDeclarationNode(node.getParameter());}
         visitCompoundStatementNode(node.getBody());

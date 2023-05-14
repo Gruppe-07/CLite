@@ -1,8 +1,14 @@
 int b = 1;
-int a = b;
 
-function main(int z) {
-    int i = 1.0;
 
+int main(int z) {
+    int i = 1;
+
+    return 1;
+}
+
+int f() {
+
+    double a = main();
 
 }

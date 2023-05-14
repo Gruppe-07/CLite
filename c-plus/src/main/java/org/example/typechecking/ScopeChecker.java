@@ -12,8 +12,11 @@ import java.util.Stack;
 public class ScopeChecker extends AstVisitor {
     private final Stack<SymbolTable> tableStack;
     private Type currentType;
+    private Type functionType;
 
     public ScopeChecker() {
+        this.currentType = null;
+        this.functionType = null;
         this.tableStack = new Stack<>();
         //Add global scope to stack
         tableStack.push(new SymbolTable(null));
@@ -121,10 +124,14 @@ public class ScopeChecker extends AstVisitor {
             throw new RuntimeException(name + " is not a defined function.");
         }
         else {
-            Symbol symbol = getCurrentScope().lookupSymbol(name);
+            FunctionDefinitionSymbol symbol = (FunctionDefinitionSymbol) getCurrentScope().lookupSymbol(name);
             if (symbol.getType() != Type.FUNCTION) {
                 throw new RuntimeException(name + " is not a defined function.");
-            }}
+            }
+            if (symbol.getTypeSpecifier() != getCurrentType()) {
+                throw new RuntimeException(getCurrentType().name().toLowerCase() + " does not match function return type");
+            }
+        }
 
         if (node.getCallValue() != null) {
             node.getCallValue().accept(this);
@@ -133,7 +140,10 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
+        Type typeSpecifier = Type.valueOf(node.getTypeSpecifierNode().getType().toUpperCase());
         String functionName = node.getIdentifierNode().getName();
+
+        setFunctionType(typeSpecifier);
 
         //Throw an error if function name has already been declared
         if (getCurrentScope().lookupSymbol(functionName) != null) {
@@ -153,10 +163,12 @@ public class ScopeChecker extends AstVisitor {
             }
         }
 
-        FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, paramSymbol);
+        FunctionDefinitionSymbol funcSymbol = new FunctionDefinitionSymbol(functionName, Type.FUNCTION, typeSpecifier, paramSymbol);
         getCurrentScope().addSymbol(functionName, funcSymbol);
 
         visitFunctionBody(node.getBody(), paramSymbol);
+
+        setFunctionType(null);
 
     }
 
@@ -260,7 +272,9 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitReturnStatementNode(ReturnStatementNode node) {
         if (node.getReturnValue() != null) {
+            setCurrentType(functionType);
             node.getReturnValue().accept(this);
+            setCurrentType(null);
         }
     }
 
@@ -301,5 +315,13 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitConstantNode(ConstantNode node) {
 
+    }
+
+    public Type getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(Type functionType) {
+        this.functionType = functionType;
     }
 }
