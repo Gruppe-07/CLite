@@ -6,7 +6,6 @@ import org.example.typechecking.symbols.FunctionDefinitionSymbol;
 import org.example.typechecking.symbols.Symbol;
 import org.example.typechecking.symbols.VariableSymbol;
 
-import java.util.List;
 import java.util.Stack;
 
 public class ScopeChecker extends AstVisitor {

@@ -91,11 +91,9 @@ grammar CLite;
         ;
 
     typeSpecifier
-        :   'void'
-        |   'char'
-        |   'int'
+        :   'int'
         |   'double'
-        |   'string'
+
         ;
 
     declaration
