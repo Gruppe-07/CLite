@@ -108,9 +108,10 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitFloatConstantNode(FloatConstantNode node) {
-        if (getCurrentType() != Type.DOUBLE) {
+        if (getCurrentType() != Type.DOUBLE && getCurrentType() != null) {
             throw new RuntimeException("Operand does not match type: " + getCurrentType());
         }
+        if (getCurrentType() == null) {setCurrentType(Type.DOUBLE);}
     }
 
 
@@ -214,9 +215,10 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitIntegerConstantNode(IntegerConstantNode node) {
-        if (getCurrentType() != Type.INT) {
+        if (getCurrentType() != Type.INT && getCurrentType() != null) {
             throw new RuntimeException("Operand does not match type: " + getCurrentType());
         }
+        if (getCurrentType() == null) {setCurrentType(Type.INT);}
     }
 
     @Override
@@ -303,12 +305,15 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitExpressionStatementNode(ExpressionStatementNode node) {
-        node.getExpressionNode().accept(this);
+        setCurrentType(null);
+        visitExpressionNode(node.getExpressionNode());
     }
 
     @Override
     public void visitExpressionNode(ExpressionNode node) {
+        setCurrentType(null);
         node.accept(this);
+
     }
 
     @Override

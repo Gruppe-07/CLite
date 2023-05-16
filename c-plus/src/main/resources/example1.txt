@@ -1,16 +1,8 @@
-int b = 1;
-
-int mains(int h) {}
 
 
-int main(int z) {
-    int i = 1;
-
-    return 1;
-}
-
-int f() {
-
-    int a = main();
-
+int main() {
+    if(1.0 == 1.0) {
+    1 == 1;
+    1.0 == 1.0;
+    return 1;}
 }
