@@ -147,122 +147,89 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
     //Expressions
 
     @Override public ExpressionNode visitMultiplicativeExpression(CLiteParser.MultiplicativeExpressionContext ctx) {
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        if (ctx.unaryExpression() != null) {return visitUnaryExpression(ctx.unaryExpression());}
 
-            for (CLiteParser.UnaryExpressionContext unaryExpressionContext : ctx.unaryExpression()) {
-                if (unaryExpressionContext != null) {
-                    operands.add(visitUnaryExpression(unaryExpressionContext));
-                }
-            }
-            for (ParseTree child: ctx.children) {
-                if (child instanceof TerminalNode) { operators.add(child.getText()); }
-            }
+        MultiplicativeExpressionNode node = new MultiplicativeExpressionNode();
+        node.setLeft(visitMultiplicativeExpression(ctx.multiplicativeExpression(0)));
+        node.setRight(visitMultiplicativeExpression(ctx.multiplicativeExpression(1)));
 
-            return new MultiplicativeExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitUnaryExpression(ctx.unaryExpression(0));
+
+        return node;
     }
 
     @Override public ExpressionNode visitAdditiveExpression(CLiteParser.AdditiveExpressionContext ctx) {
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        if (ctx.multiplicativeExpression() != null) {return visitMultiplicativeExpression(ctx.multiplicativeExpression());}
 
-            for (CLiteParser.MultiplicativeExpressionContext multiplicativeExpressionContext : ctx.multiplicativeExpression()) {
-                operands.add(visitMultiplicativeExpression(multiplicativeExpressionContext));
-            }
+        AdditiveExpressionNode node = new AdditiveExpressionNode();
+        node.setLeft(visitAdditiveExpression(ctx.additiveExpression(0)));
+        node.setRight(visitAdditiveExpression(ctx.additiveExpression(1)));
 
-            for (ParseTree child: ctx.children) {
-                if (child instanceof TerminalNode) {
-                    operators.add(child.getText());
-                }
-            }
-
-            return new AdditiveExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitMultiplicativeExpression(ctx.multiplicativeExpression(0));
+
+        return node;
     }
 
     @Override public ExpressionNode visitRelationalExpression(CLiteParser.RelationalExpressionContext ctx) {
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        if (ctx.additiveExpression() != null) {return visitAdditiveExpression(ctx.additiveExpression());}
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.AdditiveExpressionContext){
-                    operands.add(visitAdditiveExpression((CLiteParser.AdditiveExpressionContext) child));
+        RelationalExpressionNode node = new RelationalExpressionNode();
+        node.setLeft(visitRelationalExpression(ctx.relationalExpression(0)));
+        node.setRight(visitRelationalExpression(ctx.relationalExpression(1)));
 
-                }
-                else {
-                    operators.add(child.getText());
-                }
-            }
-            return new RelationalExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitAdditiveExpression(ctx.additiveExpression(0));
+
+        return node;
     }
 
     @Override public ExpressionNode visitEqualityExpression(CLiteParser.EqualityExpressionContext ctx) {
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        if (ctx.relationalExpression() != null) {return visitRelationalExpression(ctx.relationalExpression());}
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.RelationalExpressionContext){
-                    operands.add(visitRelationalExpression((CLiteParser.RelationalExpressionContext) child));
+        EqualityExpressionNode node = new EqualityExpressionNode();
+        node.setLeft(visitEqualityExpression(ctx.equalityExpression(0)));
+        node.setRight(visitEqualityExpression(ctx.equalityExpression(1)));
 
-                }
-                else {
-                    operators.add(child.getText());
-                }
-            }
-            return new EqualityExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitRelationalExpression(ctx.relationalExpression(0));
+
+        return node;
     }
 
     @Override
     public ExpressionNode visitLogicalAndExpression(CLiteParser.LogicalAndExpressionContext ctx) {
+        if (ctx.equalityExpression() != null) {return visitEqualityExpression(ctx.equalityExpression());}
 
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        LogicalAndExpressionNode node = new LogicalAndExpressionNode();
+        node.setLeft(visitLogicalAndExpression(ctx.logicalAndExpression(0)));
+        node.setRight(visitLogicalAndExpression(ctx.logicalAndExpression(1)));
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.EqualityExpressionContext){
-                    operands.add(visitEqualityExpression((CLiteParser.EqualityExpressionContext) child));
-
-                }
-                else {
-                    operators.add(child.getText());
-                }
-            }
-            return new LogicalAndExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitEqualityExpression(ctx.equalityExpression(0));
+
+        return node;
     }
 
     @Override
     public ExpressionNode visitLogicalOrExpression(CLiteParser.LogicalOrExpressionContext ctx) {
+        if (ctx.logicalAndExpression() != null) {return visitLogicalAndExpression(ctx.logicalAndExpression());}
 
-        if (ctx.children.size() > 1) {
-            List<ExpressionNode> operands = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+        LogicalOrExpressionNode node = new LogicalOrExpressionNode();
+        node.setLeft(visitLogicalOrExpression(ctx.logicalOrExpression(0)));
+        node.setRight(visitLogicalOrExpression(ctx.logicalOrExpression(1)));
 
-            for(ParseTree child: ctx.children){
-                if (child instanceof CLiteParser.LogicalAndExpressionContext){
-                    operands.add(visitLogicalAndExpression((CLiteParser.LogicalAndExpressionContext) child));
-
-                }
-                else {
-                    operators.add(child.getText());
-                }
-            }
-            return new LogicalOrExpressionNode(operands, operators);
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode) {node.setOperator(child.getText());}
         }
-        return visitLogicalAndExpression(ctx.logicalAndExpression(0));
+
+        return node;
     }
 
 

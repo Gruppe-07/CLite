@@ -47,9 +47,8 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override
@@ -96,9 +95,8 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitEqualityExpressionNode(EqualityExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override
@@ -223,23 +221,20 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override
     public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override
     public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override
@@ -265,9 +260,8 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitRelationalExpressionNode(RelationalExpressionNode node) {
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            expressionNode.accept(this);
-        }
+        node.getLeft().accept(this);
+        node.getLeft().accept(this);
     }
 
     @Override

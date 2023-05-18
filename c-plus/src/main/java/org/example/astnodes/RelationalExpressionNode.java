@@ -3,22 +3,7 @@ import org.example.AstVisitor;
 
 import java.util.List;
 
-public class RelationalExpressionNode extends ExpressionNode {
-    public List<ExpressionNode> Operands;
-    public List<String> Operators;
-
-    public RelationalExpressionNode(List<ExpressionNode> operands, List<String> operators) {
-        Operands = operands;
-        Operators = operators;
-    }
-
-    public List<ExpressionNode> getOperands() {
-        return Operands;
-    }
-
-    public List<String> getOperators() {
-        return Operators;
-    }
+public class RelationalExpressionNode extends BinaryExpressionNode {
 
     @Override
     public void accept(AstVisitor visitor) {

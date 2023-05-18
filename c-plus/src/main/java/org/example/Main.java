@@ -10,6 +10,7 @@ import com.myparser.parser.CLiteLexer;
 import com.myparser.parser.CLiteParser;
 import org.example.astnodes.BuildASTVisitor;
 import org.example.astnodes.TranslationUnitNode;
+import org.example.codegeneration.CodeGenerator;
 import org.example.typechecking.ScopeChecker;
 
 public class Main {
@@ -34,6 +35,9 @@ public class Main {
 
             ScopeChecker scopeChecker = new ScopeChecker();
             scopeChecker.checkScope(ast);
+
+            CodeGenerator codeGenerator = new CodeGenerator();
+            codeGenerator.generateCode(ast);
 
 
         } catch (IOException e) {

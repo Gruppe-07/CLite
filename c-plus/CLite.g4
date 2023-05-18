@@ -9,27 +9,33 @@ grammar CLite;
         ;
 
     multiplicativeExpression
-        :   unaryExpression (('*'|'/'|'%') unaryExpression)*
+        :   unaryExpression
+        |   multiplicativeExpression ('*'|'/'|'%') multiplicativeExpression
         ;
 
     additiveExpression
-        :   multiplicativeExpression (('+'|'-') multiplicativeExpression)*
+        :   multiplicativeExpression
+        |   additiveExpression ('+' | '-') additiveExpression
         ;
 
     relationalExpression
-        :   additiveExpression (('<'|'>'|'<='|'>=') additiveExpression)*
+        :   additiveExpression
+        |   relationalExpression (('<'|'>'|'<='|'>=') relationalExpression)
         ;
 
     equalityExpression
-        :   relationalExpression (('=='| '!=') relationalExpression)*
+        :   relationalExpression
+        |   equalityExpression ('=='| '!=') equalityExpression
         ;
 
     logicalAndExpression
-        :   equalityExpression ('&&' equalityExpression)*
+        :   equalityExpression
+        |   logicalAndExpression '&&' logicalAndExpression
         ;
 
     logicalOrExpression
-        :   logicalAndExpression ( '||' logicalAndExpression)*
+        :   logicalAndExpression
+        |   logicalOrExpression  '||' logicalOrExpression
         ;
 
 

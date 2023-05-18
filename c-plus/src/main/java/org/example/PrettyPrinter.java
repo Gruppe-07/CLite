@@ -8,15 +8,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println(getIndentString() + "Operators: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
@@ -79,15 +76,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitEqualityExpressionNode(EqualityExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println(getIndentString() + "Operators: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
@@ -166,15 +160,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println(getIndentString() + "Operators: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
@@ -182,15 +173,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println("Operatos: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
@@ -198,15 +186,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println("Operatos: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
@@ -261,15 +246,12 @@ public class PrettyPrinter extends AstVisitor{
     @Override
     public void visitRelationalExpressionNode(RelationalExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
-        for (String operator : node.getOperators()) {
-            System.out.println(getIndentString() + "Operators: " + operator);
-        }
 
         indent();
 
-        for (ExpressionNode expressionNode : node.getOperands()) {
-            visitExpressionNode(expressionNode);
-        }
+        visitExpressionNode(node.getLeft());
+        System.out.println(getIndentString() + node.getOperator());
+        visitExpressionNode(node.getRight());
 
         dedent();
     }
