@@ -5,7 +5,6 @@ import org.example.astnodes.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Objects;
 
 
 public class CodeGenerator extends AstVisitor {
@@ -58,7 +57,7 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
+    public String visitAdditiveExpressionNode(AdditiveExpressionNode node) {
         if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode) {
             node.getLeft().accept(this);
             node.getRight().accept(this);
@@ -66,15 +65,16 @@ public class CodeGenerator extends AstVisitor {
 
         //This code is reached when subexpression is evaluated
         switch (node.getOperator()) {
-            case "+":
-                writeAdditionInstructions(node);
-                break;
-            case "-":
-                writeSubtractionInstructions(node);
+            case "+" -> {
+                return writeAdditionInstructions(node);
+            }
+            case "-" -> {
+                return writeSubtractionInstructions(node);
+            }
         }
     }
 
-    private void writeSubtractionInstructions(AdditiveExpressionNode node) {
+    private String writeSubtractionInstructions(AdditiveExpressionNode node, String resultRegister) {
         String registerType = "X";
 
         //Result register is null when the first subexpression to evaluate is reached
@@ -98,26 +98,29 @@ public class CodeGenerator extends AstVisitor {
             stack.push(registerType, operand);
 
         }
+        return resultRegister;
     }
 
     @Override
-    public void visitAssignmentExpressionNode(AssignmentExpressionNode node) {
+    public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitCharacterConstantNode(CharacterConstantNode node) {
-
+    public String visitCharacterConstantNode(CharacterConstantNode node) {
+        return node.getValue();
     }
 
     @Override
-    public void visitCompoundStatementNode(CompoundStatementNode node) {
+    public Object visitCompoundStatementNode(CompoundStatementNode node) {
 
 
+        return null;
     }
 
     @Override
-    public void visitDeclarationNode(DeclarationNode node) {
+    public Object visitDeclarationNode(DeclarationNode node) {
         String type = node.getTypeSpecifierNode().getType();
         String identifier = node.getIdentifierNode().getName();
 
@@ -126,48 +129,55 @@ public class CodeGenerator extends AstVisitor {
 
         stack.push("X", resultRegister);
         resultRegister = null;
+        return null;
     }
 
     @Override
-    public void visitEqualityExpressionNode(EqualityExpressionNode node) {
+    public Object visitEqualityExpressionNode(EqualityExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitExternalDeclarationNode(ExternalDeclarationNode node) {
+    public Object visitExternalDeclarationNode(ExternalDeclarationNode node) {
         node.getFuncDefOrDecl().accept(this);
+        return null;
     }
 
     @Override
-    public void visitFloatConstantNode(FloatConstantNode node) {
-
+    public String visitFloatConstantNode(FloatConstantNode node) {
+        return "#" + Double.toString(node.getValue());
     }
 
     @Override
-    public void visitFunctionCallNode(FunctionCallNode node) {
+    public Object visitFunctionCallNode(FunctionCallNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
+    public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String name = node.getIdentifierNode().getName();
 
         assemblyCode.append(name+ ":\n");
+        return null;
     }
 
     @Override
-    public void visitIdentifierNode(IdentifierNode node) {
-
+    public String visitIdentifierNode(IdentifierNode node) {
+        //TODO get address of variable and return
+        return node.getName();
     }
 
     @Override
-    public void visitIfElseNode(IfElseNode node) {
+    public Object visitIfElseNode(IfElseNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitIntegerConstantNode(IntegerConstantNode node) {
-
+    public String visitIntegerConstantNode(IntegerConstantNode node) {
+        return "#" + Integer.toString(node.getValue());
     }
 
     public String getConstant(ExpressionNode node) {
@@ -194,19 +204,21 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
+    public Object visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
 
+        return null;
     }
     @Override
-    public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
+    public String visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
-        if (!(node.getLeft() instanceof ConstantNode)) {
-            node.getLeft().accept(this);
-            node.getRight().accept(this);
+    public String visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
+        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode) {
+            visitExpressionNode(node.getLeft());
+            visitExpressionNode(node.getRight());
         }
 
         //This code is reached when subexpression is evaluated
@@ -219,7 +231,7 @@ public class CodeGenerator extends AstVisitor {
         }
     }
 
-    public void writeAdditionInstructions(AdditiveExpressionNode node) {
+    public String writeAdditionInstructions(AdditiveExpressionNode node) {
         String registerType = "X";
 
         //Result register is null when the first subexpression to evaluate is reached
@@ -228,8 +240,8 @@ public class CodeGenerator extends AstVisitor {
 
             String operand1 = stack.pop(registerType);
             String operand2 = stack.pop(registerType);
-            assemblyCode.append("   MOV " + operand1 + ", #"+ getConstant(node.getLeft()) + "\n");
-            assemblyCode.append("   MOV " + operand2 + ", #" + getConstant(node.getRight()) + "\n");
+            assemblyCode.append("   MOV " + operand1 + ", "+ getConstant(node.getLeft()) + "\n");
+            assemblyCode.append("   MOV " + operand2 + ", " + getConstant(node.getRight()) + "\n");
 
             assemblyCode.append("   ADD " + resultRegister + ", " + operand1 + ", " + operand2 +"\n\n");
 
@@ -241,8 +253,8 @@ public class CodeGenerator extends AstVisitor {
 
             assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
             stack.push(registerType, operand);
-
         }
+        return registerType;
     }
 
     public void writeMultiplicationInstructions(MultiplicativeExpressionNode node) {
@@ -273,69 +285,80 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public void visitNegationNode(NegationNode node) {
+    public Object visitNegationNode(NegationNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitParameterDeclarationNode(ParameterDeclarationNode node) {
+    public Object visitParameterDeclarationNode(ParameterDeclarationNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitParensExpressionNode(ParensExpressionNode node) {
+    public Object visitParensExpressionNode(ParensExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitPostFixExpressionNode(PostFixExpressionNode node) {
+    public Object visitPostFixExpressionNode(PostFixExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitRelationalExpressionNode(RelationalExpressionNode node) {
+    public Object visitRelationalExpressionNode(RelationalExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitReturnStatementNode(ReturnStatementNode node) {
+    public Object visitReturnStatementNode(ReturnStatementNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitTranslationUnitNode(TranslationUnitNode node) {
+    public Object visitTranslationUnitNode(TranslationUnitNode node) {
         for(ExternalDeclarationNode externalDeclarationNode : node.getExternalDeclarationNodeList()) {
             externalDeclarationNode.accept(this);
         }
+        return null;
     }
 
     @Override
-    public void visitTypeSpecifierNode(TypeSpecifierNode node) {
-
+    public String visitTypeSpecifierNode(TypeSpecifierNode node) {
+        return node.getType();
     }
 
     @Override
-    public void visitUnaryExpressionNode(UnaryExpressionNode node) {
+    public Object visitUnaryExpressionNode(UnaryExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitWhileLoopNode(WhileLoopNode node) {
+    public Object visitWhileLoopNode(WhileLoopNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitExpressionStatementNode(ExpressionStatementNode node) {
+    public Object visitExpressionStatementNode(ExpressionStatementNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitExpressionNode(ExpressionNode node) {
+    public Object visitExpressionNode(ExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitConstantNode(ConstantNode node) {
-
+    public String visitConstantNode(ConstantNode node) {
+        return (String) node.accept(this);
     }
 }

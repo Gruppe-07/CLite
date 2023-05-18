@@ -13,7 +13,7 @@ public class ExternalDeclarationNode extends AstNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitExternalDeclarationNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitExternalDeclarationNode(this);
     }
 }

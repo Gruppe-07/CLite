@@ -6,7 +6,7 @@ public class PrettyPrinter extends AstVisitor{
     private int indentLevel = 0;
 
     @Override
-    public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
+    public Object visitAdditiveExpressionNode(AdditiveExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -16,10 +16,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitAssignmentExpressionNode(AssignmentExpressionNode node) {
+    public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -28,15 +29,17 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitCharacterConstantNode(CharacterConstantNode node) {
+    public Object visitCharacterConstantNode(CharacterConstantNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": " + node.getValue());
+        return null;
     }
 
     @Override
-    public void visitCompoundStatementNode(CompoundStatementNode node) {
+    public Object visitCompoundStatementNode(CompoundStatementNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -46,19 +49,21 @@ public class PrettyPrinter extends AstVisitor{
         }
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitExpressionStatementNode(ExpressionStatementNode node) {
+    public Object visitExpressionStatementNode(ExpressionStatementNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
         visitExpressionNode(node.getExpressionNode());
         dedent();
+        return null;
     }
 
     @Override
-    public void visitDeclarationNode(DeclarationNode node) {
+    public Object visitDeclarationNode(DeclarationNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": isConst " + node.getConst());
 
         indent();
@@ -71,10 +76,11 @@ public class PrettyPrinter extends AstVisitor{
 
         dedent();
 
+        return null;
     }
 
     @Override
-    public void visitEqualityExpressionNode(EqualityExpressionNode node) {
+    public Object visitEqualityExpressionNode(EqualityExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -84,26 +90,29 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitExternalDeclarationNode(ExternalDeclarationNode node) {
+    public Object visitExternalDeclarationNode(ExternalDeclarationNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
         indent();
 
         node.getFuncDefOrDecl().accept(this);
 
         dedent();;
+        return null;
     }
 
     @Override
-    public void visitFloatConstantNode(FloatConstantNode node) {
+    public Object visitFloatConstantNode(FloatConstantNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": " + node.getValue());
+        return null;
     }
 
 
     @Override
-    public void visitFunctionCallNode(FunctionCallNode node) {
+    public Object visitFunctionCallNode(FunctionCallNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -115,10 +124,11 @@ public class PrettyPrinter extends AstVisitor{
         }
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
+    public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -129,15 +139,17 @@ public class PrettyPrinter extends AstVisitor{
         visitCompoundStatementNode(node.getBody());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitIdentifierNode(IdentifierNode node) {
+    public Object visitIdentifierNode(IdentifierNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": " + node.getName());
+        return null;
     }
 
     @Override
-    public void visitIfElseNode(IfElseNode node) {
+    public Object visitIfElseNode(IfElseNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -150,15 +162,17 @@ public class PrettyPrinter extends AstVisitor{
         }
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitIntegerConstantNode(IntegerConstantNode node) {
+    public Object visitIntegerConstantNode(IntegerConstantNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": " + node.getValue());
+        return null;
     }
 
     @Override
-    public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
+    public Object visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -168,10 +182,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
+    public Object visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -181,10 +196,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
+    public Object visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -194,10 +210,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitNegationNode(NegationNode node) {
+    public Object visitNegationNode(NegationNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -205,10 +222,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getInnerExpressionNode());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitParameterDeclarationNode(ParameterDeclarationNode node) {
+    public Object visitParameterDeclarationNode(ParameterDeclarationNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -218,10 +236,11 @@ public class PrettyPrinter extends AstVisitor{
 
         dedent();
 
+        return null;
     }
 
     @Override
-    public void visitParensExpressionNode(ParensExpressionNode node) {
+    public Object visitParensExpressionNode(ParensExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -229,10 +248,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getInnerExpressionNode());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitPostFixExpressionNode(PostFixExpressionNode node) {
+    public Object visitPostFixExpressionNode(PostFixExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -241,10 +261,11 @@ public class PrettyPrinter extends AstVisitor{
         System.out.println(getIndentString() + "Operator: " + node.getOperator());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitRelationalExpressionNode(RelationalExpressionNode node) {
+    public Object visitRelationalExpressionNode(RelationalExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -254,10 +275,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getRight());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitReturnStatementNode(ReturnStatementNode node) {
+    public Object visitReturnStatementNode(ReturnStatementNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -265,10 +287,11 @@ public class PrettyPrinter extends AstVisitor{
         visitExpressionNode(node.getReturnValue());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitTranslationUnitNode(TranslationUnitNode node) {
+    public Object visitTranslationUnitNode(TranslationUnitNode node) {
         System.out.println(node.getClass().getSimpleName());
         indent();
 
@@ -276,22 +299,25 @@ public class PrettyPrinter extends AstVisitor{
             visitExternalDeclarationNode(child);
         }
         dedent();
+        return null;
     }
 
 
     @Override
-    public void visitTypeSpecifierNode(TypeSpecifierNode node) {
+    public Object visitTypeSpecifierNode(TypeSpecifierNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName() + ": " + node.getType());
+        return null;
     }
 
     @Override
-    public void visitUnaryExpressionNode(UnaryExpressionNode node) {
+    public Object visitUnaryExpressionNode(UnaryExpressionNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
+        return null;
     }
 
 
     @Override
-    public void visitWhileLoopNode(WhileLoopNode node) {
+    public Object visitWhileLoopNode(WhileLoopNode node) {
         System.out.println(getIndentString() + node.getClass().getSimpleName());
 
         indent();
@@ -300,16 +326,19 @@ public class PrettyPrinter extends AstVisitor{
         visitCompoundStatementNode(node.getBody());
 
         dedent();
+        return null;
     }
 
     @Override
-    public void visitExpressionNode(ExpressionNode node) {
+    public Object visitExpressionNode(ExpressionNode node) {
         node.accept(this);
+        return null;
     }
 
     @Override
-    public void visitConstantNode(ConstantNode node) {
+    public Object visitConstantNode(ConstantNode node) {
         node.accept(this);
+        return null;
     }
 
     private void indent() {

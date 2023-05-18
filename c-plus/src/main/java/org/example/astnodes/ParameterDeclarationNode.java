@@ -31,7 +31,7 @@ public class ParameterDeclarationNode extends AstNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitParameterDeclarationNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitParameterDeclarationNode(this);
     }
 }

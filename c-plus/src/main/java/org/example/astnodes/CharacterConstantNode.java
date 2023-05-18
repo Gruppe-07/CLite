@@ -2,6 +2,8 @@ package org.example.astnodes;
 
 import org.example.AstVisitor;
 
+import java.util.Objects;
+
 public class CharacterConstantNode extends ConstantNode {
 
     public String value;
@@ -19,7 +21,7 @@ public class CharacterConstantNode extends ConstantNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitCharacterConstantNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitCharacterConstantNode(this);
     }
 }

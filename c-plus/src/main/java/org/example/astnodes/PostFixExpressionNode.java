@@ -20,8 +20,8 @@ public class PostFixExpressionNode extends UnaryExpressionNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitPostFixExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitPostFixExpressionNode(this);
     }
 }
 

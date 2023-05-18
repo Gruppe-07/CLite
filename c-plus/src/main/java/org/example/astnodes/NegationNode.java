@@ -14,7 +14,7 @@ public class NegationNode extends UnaryExpressionNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitNegationNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitNegationNode(this);
     }
 }

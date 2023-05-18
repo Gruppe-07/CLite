@@ -13,7 +13,7 @@ public class IdentifierNode extends ExpressionNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitIdentifierNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitIdentifierNode(this);
     }
 }

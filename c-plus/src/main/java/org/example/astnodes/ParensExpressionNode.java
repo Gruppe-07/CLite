@@ -14,7 +14,7 @@ public class ParensExpressionNode extends ExpressionNode{
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitParensExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitParensExpressionNode(this);
     }
 }

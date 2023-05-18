@@ -2,15 +2,18 @@
 .align 2
 
 _start:
-   // Declare i
-   MOV X1, #10
-   MOV X2, #10
-   MUL X0, X1, X2
+   // Declare a
+   MOV X1, #1
+   MOV X2, #2
+   ADD X0, X1, X2
 
    MOV X1, #5
+   MUL X0, X0, X1
+
+   MOV X1, #null
    ADD X0, X0, X1
 
-   MOV X1, #3
+   MOV X1, #1
    SUB X0, X0, X1
 
    mov X16, #4

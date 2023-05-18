@@ -7,8 +7,8 @@ public class AdditiveExpressionNode extends BinaryExpressionNode {
 
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitAdditiveExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitAdditiveExpressionNode(this);
     }
 }
 

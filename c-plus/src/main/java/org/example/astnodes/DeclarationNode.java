@@ -2,8 +2,6 @@ package org.example.astnodes;
 
 import org.example.AstVisitor;
 
-import java.util.List;
-
 public class DeclarationNode extends BlockItemNode {
     public Boolean isConst;
     public TypeSpecifierNode typeSpecifierNode;
@@ -43,8 +41,8 @@ public class DeclarationNode extends BlockItemNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitDeclarationNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitDeclarationNode(this);
     }
 }
 

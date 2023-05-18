@@ -17,7 +17,7 @@ public class FloatConstantNode extends ConstantNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitFloatConstantNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitFloatConstantNode(this);
     }
 }

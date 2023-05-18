@@ -16,8 +16,8 @@ public class TranslationUnitNode extends AstNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitTranslationUnitNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitTranslationUnitNode(this);
     }
 }
 

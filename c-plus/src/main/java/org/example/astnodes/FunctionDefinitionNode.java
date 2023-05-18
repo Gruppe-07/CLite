@@ -35,8 +35,8 @@ public class FunctionDefinitionNode extends AstNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitFunctionDefinitionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitFunctionDefinitionNode(this);
     }
 
     public TypeSpecifierNode getTypeSpecifierNode() {

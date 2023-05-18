@@ -13,7 +13,7 @@ public class ExpressionStatementNode extends StatementNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitExpressionStatementNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitExpressionStatementNode(this);
     }
 }
