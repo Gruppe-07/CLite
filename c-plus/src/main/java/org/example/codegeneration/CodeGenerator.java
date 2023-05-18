@@ -70,7 +70,33 @@ public class CodeGenerator extends AstVisitor {
                 writeAdditionInstructions(node);
                 break;
             case "-":
-                break;
+                writeSubtractionInstructions(node);
+        }
+    }
+
+    private void writeSubtractionInstructions(AdditiveExpressionNode node) {
+        String registerType = "X";
+
+        //Result register is null when the first subexpression to evaluate is reached
+        if (resultRegister == null) {
+            resultRegister = stack.pop(registerType);
+
+            String operand1 = stack.pop(registerType);
+            String operand2 = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand1 + ", #" + getConstant(node.getLeft()) + "\n");
+            assemblyCode.append("   MOV " + operand2 + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   SUB " + resultRegister + ", " + operand1 + ", " + operand2 +"\n\n");
+
+            stack.push(registerType, operand2);
+            stack.push(registerType, operand1);
+        } else {
+            String operand = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
+            stack.push(registerType, operand);
+
         }
     }
 

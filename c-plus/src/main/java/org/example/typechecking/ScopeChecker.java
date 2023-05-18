@@ -48,7 +48,7 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitEqualityExpressionNode(EqualityExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override
@@ -115,7 +115,6 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitFunctionCallNode(FunctionCallNode node) {
-
         String name = node.getIdentifierNode().getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
@@ -187,6 +186,7 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public void visitIdentifierNode(IdentifierNode node) {
+        System.out.println("Visit identifier");
         String name = node.getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
@@ -222,19 +222,19 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override
     public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override
     public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override
@@ -261,7 +261,7 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public void visitRelationalExpressionNode(RelationalExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
     }
 
     @Override

@@ -7,11 +7,11 @@ _start:
    MOV X2, #10
    MUL X0, X1, X2
 
-   MOV X1, #3
+   MOV X1, #5
    ADD X0, X0, X1
 
    MOV X1, #3
-   ADD X0, X0, X1
+   SUB X0, X0, X1
 
    mov X16, #4
    svc #0x80
