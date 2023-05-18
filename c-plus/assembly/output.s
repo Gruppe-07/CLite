@@ -2,7 +2,16 @@
 .align 2
 
 _start:
-   SUB SP, SP #4
+   // Declare i
+   MOV X1, #10
+   MOV X2, #10
+   MUL X0, X1, X2
+
+   MOV X1, #3
+   ADD X0, X0, X1
+
+   MOV X1, #3
+   ADD X0, X0, X1
 
    mov X16, #4
    svc #0x80

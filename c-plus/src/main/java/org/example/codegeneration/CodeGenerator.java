@@ -11,10 +11,11 @@ import java.util.Objects;
 public class CodeGenerator extends AstVisitor {
     private StringBuilder assemblyCode;
     private RegisterStack stack;
+    public String resultRegister;
     public void generateCode(TranslationUnitNode node) {
         assemblyCode = new StringBuilder();
         stack = new RegisterStack();
-
+        resultRegister = null;
 
         for (int i = 30; i >= 0; i--)  {
             stack.push("W",  "W" + i);
@@ -39,7 +40,7 @@ public class CodeGenerator extends AstVisitor {
 
                            mov     X0, #0
                            mov     X16, #1
-                           svc     #0x80\
+                           svc     #0x80
                         """);
 
         writeToFile("assembly/output.s", assemblyCode.toString());
@@ -58,7 +59,19 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
+        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode) {
+            node.getLeft().accept(this);
+            node.getRight().accept(this);
+        }
 
+        //This code is reached when subexpression is evaluated
+        switch (node.getOperator()) {
+            case "+":
+                writeAdditionInstructions(node);
+                break;
+            case "-":
+                break;
+        }
     }
 
     @Override
@@ -82,13 +95,11 @@ public class CodeGenerator extends AstVisitor {
         String type = node.getTypeSpecifierNode().getType();
         String identifier = node.getIdentifierNode().getName();
 
-        if (Objects.equals(type, "int")) {
-            String register = stack.pop("X");
+        assemblyCode.append("   // Declare " + identifier + "\n");
+        node.getValue().accept(this);
 
-            assemblyCode.append("""
-                       SUB SP, SP #4\n
-                    """);
-        }
+        stack.push("X", resultRegister);
+        resultRegister = null;
     }
 
     @Override
@@ -133,6 +144,29 @@ public class CodeGenerator extends AstVisitor {
 
     }
 
+    public String getConstant(ExpressionNode node) {
+        if (node instanceof IntegerConstantNode) {
+            return getIntegerConstant((IntegerConstantNode) node);
+        } else if (node instanceof FloatConstantNode) {
+            return getDoubleConstant((FloatConstantNode) node);
+        } else if (node instanceof IdentifierNode) {
+            return getVariableAddress((IdentifierNode) node);
+        }
+        return null;
+    }
+
+    public String getIntegerConstant(IntegerConstantNode node) {
+        return Integer.toString(node.getValue());
+    }
+
+    public String getDoubleConstant(FloatConstantNode node) {
+        return Double.toString(node.getValue());
+    }
+
+    public String getVariableAddress(IdentifierNode node) {
+        return "test";
+    }
+
     @Override
     public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
 
@@ -144,7 +178,72 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
+        if (!(node.getLeft() instanceof ConstantNode)) {
+            node.getLeft().accept(this);
+            node.getRight().accept(this);
+        }
 
+        //This code is reached when subexpression is evaluated
+        switch (node.getOperator()) {
+            case "*":
+                writeMultiplicationInstructions(node);
+                break;
+            case "/":
+                break;
+        }
+    }
+
+    public void writeAdditionInstructions(AdditiveExpressionNode node) {
+        String registerType = "X";
+
+        //Result register is null when the first subexpression to evaluate is reached
+        if (resultRegister == null) {
+            resultRegister = stack.pop(registerType);
+
+            String operand1 = stack.pop(registerType);
+            String operand2 = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand1 + ", #"+ getConstant(node.getLeft()) + "\n");
+            assemblyCode.append("   MOV " + operand2 + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   ADD " + resultRegister + ", " + operand1 + ", " + operand2 +"\n\n");
+
+            stack.push(registerType, operand2);
+            stack.push(registerType, operand1);
+        } else {
+            String operand = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
+            stack.push(registerType, operand);
+
+        }
+    }
+
+    public void writeMultiplicationInstructions(MultiplicativeExpressionNode node) {
+        String registerType = "X";
+
+        //Result register is null when the first subexpression to evaluate is reached
+        if (resultRegister == null) {
+            resultRegister = stack.pop(registerType);
+
+            String operand1 = stack.pop(registerType);
+            String operand2 = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand1 + ", #" + getConstant(node.getLeft()) + "\n");
+            assemblyCode.append("   MOV " + operand2 + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   MUL " + resultRegister + ", " + operand1 + ", " + operand2 +"\n\n");
+
+            stack.push(registerType, operand2);
+            stack.push(registerType, operand1);
+        }
+        else {
+            String operand = stack.pop(registerType);
+            assemblyCode.append("   MOV " + operand + ", #" + getConstant(node.getRight()) + "\n");
+
+            assemblyCode.append("   MUL " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
+            stack.push(registerType, operand);
+
+        }
     }
 
     @Override
