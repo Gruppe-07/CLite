@@ -117,8 +117,21 @@ public class CodeGenerator extends AstVisitor {
         String identifier = node.getIdentifierNode().getName();
 
         assemblyCode.append("   // Declare " + identifier + "\n");
+
         String resultRegister = (String) node.getValue().accept(this);
-        assemblyCode.append("   STR " + resultRegister +", [SP, #-16]!\n\n");
+        if (!(resultRegister.contains("X"))) {
+            String varRegister = stack.pop("X");
+
+            assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
+            resultRegister = varRegister;
+            stack.push("X", varRegister);
+        }
+        assemblyCode.append("   SUB FP, SP, #16\n");
+        assemblyCode.append("   SUB SP, SP, #16\n");
+        assemblyCode.append("   STR " + resultRegister +", [FP]\n\n");
+
+
+        stack.push("X", resultRegister);
 
         return null;
     }
@@ -151,12 +164,15 @@ public class CodeGenerator extends AstVisitor {
         String name = node.getIdentifierNode().getName();
 
         assemblyCode.append(name+ ":\n");
+
+        node.getBody().accept(this);
         return null;
     }
 
     @Override
     public String visitIdentifierNode(IdentifierNode node) {
         //TODO get address of variable and return
+        assemblyCode.append("   LDR\n");
         return node.getName();
     }
 
@@ -169,21 +185,6 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public String visitIntegerConstantNode(IntegerConstantNode node) {
         return "#" + node.getValue();
-    }
-
-    public String getAddressOrValue(ExpressionNode node) {
-        if (node instanceof IntegerConstantNode) {
-            return getIntegerConstant((IntegerConstantNode) node);
-        } else if (node instanceof FloatConstantNode) {
-            return getDoubleConstant((FloatConstantNode) node);
-        } else if (node instanceof IdentifierNode) {
-            return getVariableAddress((IdentifierNode) node);
-        } else if (node instanceof BinaryExpressionNode) {
-            return visitBinaryExpression((BinaryExpressionNode) node);
-        } else if (node instanceof ParensExpressionNode) {
-            return visitParensExpressionNode((ParensExpressionNode) node);
-        }
-        return null;
     }
 
     public String visitBinaryExpression(BinaryExpressionNode node) {
@@ -220,7 +221,7 @@ public class CodeGenerator extends AstVisitor {
             case "*":
                 return writeBinaryExpressionInstructions(node, "MUL");
             case "/":
-                break;
+                return writeBinaryExpressionInstructions(node, "SDIV");
         }
         return null;
     }
