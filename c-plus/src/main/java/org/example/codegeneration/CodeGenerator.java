@@ -56,41 +56,43 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitAdditiveExpressionNode(AdditiveExpressionNode node) {
-        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode
-            || node.getLeft() instanceof ParensExpressionNode || node.getRight() instanceof ParensExpressionNode) {
-            node.getLeft().accept(this);
-            node.getRight().accept(this);
-        }
 
         //This code is reached when subexpression is evaluated
         switch (node.getOperator()) {
             case "+" -> {
-                return writeAdditionInstructions(node);
+                return writeBinaryExpressionInstructions(node, "ADD");
             }
             case "-" -> {
-                return writeSubtractionInstructions(node);
+                return writeBinaryExpressionInstructions(node, "SUB");
             }
         }
         return null;
     }
 
-    private String writeSubtractionInstructions(AdditiveExpressionNode node) {
-        String registerType = "X";
+    private String writeBinaryExpressionInstructions(BinaryExpressionNode node, String operation) {
+        String operand1 = (String) node.getLeft().accept(this);
+        String operand2 = (String) node.getRight().accept(this);
 
-        //Result register is null when the first subexpression to evaluate is reached
-        String resultRegister = stack.pop(registerType);
+        String register1 = stack.pop("X");
+        String register2 = stack.pop("X");
 
-        String operand = stack.pop(registerType);
+        if (operand1.contains("X")) { stack.push("X", operand1); }
+        if (operand2.contains("X")) { stack.push("X", operand2); }
 
-        assemblyCode.append("   MOV " + resultRegister + ", " + getAddressOrValue(node.getLeft()) + "\n");
-        assemblyCode.append("   MOV " + operand + ", " + getAddressOrValue(node.getRight()) + "\n");
+        String resultRegister = stack.pop("X");
 
-        assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
+        assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
+        assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
 
-        stack.push(registerType, resultRegister);
-        stack.push(registerType, operand);
+        assemblyCode.append("   " + operation + " " + resultRegister + ", " + register1 + ", " + register2 +"\n\n");
+
+        stack.push("X", register2);
+        stack.push("X", register1);
+
         return resultRegister;
     }
+
+
 
     @Override
     public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
@@ -166,7 +168,7 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitIntegerConstantNode(IntegerConstantNode node) {
-        return "#" + Integer.toString(node.getValue());
+        return "#" + node.getValue();
     }
 
     public String getAddressOrValue(ExpressionNode node) {
@@ -213,53 +215,14 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
-        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode
-        || node.getLeft() instanceof ParensExpressionNode || node.getRight() instanceof ParensExpressionNode) {
-            visitExpressionNode(node.getLeft());
-            visitExpressionNode(node.getRight());
-        }
 
         switch (node.getOperator()) {
             case "*":
-                return writeMultiplicationInstructions(node);
+                return writeBinaryExpressionInstructions(node, "MUL");
             case "/":
                 break;
         }
         return null;
-    }
-
-    public String writeAdditionInstructions(AdditiveExpressionNode node) {
-        String registerType = "X";
-
-        String resultRegister = stack.pop(registerType);
-
-        String operand = stack.pop(registerType);
-
-        assemblyCode.append("   MOV " + resultRegister + ", "+ getAddressOrValue(node.getLeft()) + "\n");
-        assemblyCode.append("   MOV " + operand + ", " + getAddressOrValue(node.getRight()) + "\n");
-
-        assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
-
-
-        stack.push(registerType, resultRegister);
-        stack.push(registerType, operand);
-        return resultRegister;
-    }
-
-    public String writeMultiplicationInstructions(MultiplicativeExpressionNode node) {
-        String registerType = "X";
-
-        String resultRegister = stack.pop(registerType);
-
-        String operand = stack.pop(registerType);
-        assemblyCode.append("   MOV " + resultRegister + ", " + getAddressOrValue(node.getLeft()) + "\n");
-        assemblyCode.append("   MOV " + operand + ", " + getAddressOrValue(node.getRight()) + "\n");
-
-        assemblyCode.append("   MUL " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
-
-        stack.push(registerType, resultRegister);
-        stack.push(registerType, operand);
-        return resultRegister;
     }
 
     @Override
