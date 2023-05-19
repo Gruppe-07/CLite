@@ -56,7 +56,8 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitAdditiveExpressionNode(AdditiveExpressionNode node) {
-        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode) {
+        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode
+            || node.getLeft() instanceof ParensExpressionNode || node.getRight() instanceof ParensExpressionNode) {
             node.getLeft().accept(this);
             node.getRight().accept(this);
         }
@@ -86,6 +87,7 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
 
+        stack.push(registerType, resultRegister);
         stack.push(registerType, operand);
         return resultRegister;
     }
@@ -110,11 +112,11 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitDeclarationNode(DeclarationNode node) {
-        String type = node.getTypeSpecifierNode().getType();
         String identifier = node.getIdentifierNode().getName();
 
         assemblyCode.append("   // Declare " + identifier + "\n");
         String resultRegister = (String) node.getValue().accept(this);
+        assemblyCode.append("   STR " + resultRegister +", [SP, #-16]!\n\n");
 
         return null;
     }
@@ -133,7 +135,7 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitFloatConstantNode(FloatConstantNode node) {
-        return "#" + Double.toString(node.getValue());
+        return "#" + node.getValue();
     }
 
     @Override
@@ -176,6 +178,8 @@ public class CodeGenerator extends AstVisitor {
             return getVariableAddress((IdentifierNode) node);
         } else if (node instanceof BinaryExpressionNode) {
             return visitBinaryExpression((BinaryExpressionNode) node);
+        } else if (node instanceof ParensExpressionNode) {
+            return visitParensExpressionNode((ParensExpressionNode) node);
         }
         return null;
     }
@@ -209,12 +213,12 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
-        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode) {
+        if (node.getLeft() instanceof BinaryExpressionNode || node.getRight() instanceof BinaryExpressionNode
+        || node.getLeft() instanceof ParensExpressionNode || node.getRight() instanceof ParensExpressionNode) {
             visitExpressionNode(node.getLeft());
             visitExpressionNode(node.getRight());
         }
 
-        //This code is reached when subexpression is evaluated
         switch (node.getOperator()) {
             case "*":
                 return writeMultiplicationInstructions(node);
@@ -227,7 +231,6 @@ public class CodeGenerator extends AstVisitor {
     public String writeAdditionInstructions(AdditiveExpressionNode node) {
         String registerType = "X";
 
-        //Result register is null when the first subexpression to evaluate is reached
         String resultRegister = stack.pop(registerType);
 
         String operand = stack.pop(registerType);
@@ -237,6 +240,8 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
 
+
+        stack.push(registerType, resultRegister);
         stack.push(registerType, operand);
         return resultRegister;
     }
@@ -252,6 +257,7 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   MUL " + resultRegister + ", " + resultRegister + ", " + operand +"\n\n");
 
+        stack.push(registerType, resultRegister);
         stack.push(registerType, operand);
         return resultRegister;
     }
@@ -269,9 +275,9 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public Object visitParensExpressionNode(ParensExpressionNode node) {
+    public String visitParensExpressionNode(ParensExpressionNode node) {
 
-        return null;
+        return (String) node.getInnerExpressionNode().accept(this);
     }
 
     @Override
