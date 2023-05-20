@@ -45,8 +45,6 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("""
                 .global _start
                 .align 2
-                   .equ VAR, 0
-                   .equ RETURN, 8
 
                 _start:
                 """);
@@ -186,9 +184,33 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public Object visitEqualityExpressionNode(EqualityExpressionNode node) {
-
+    public String visitEqualityExpressionNode(EqualityExpressionNode node) {
+        switch (node.getOperator()) {
+            case "==":
+                return writeEqualityExpressionInstructions(node);
+            //case "/":
+                //return writeBinaryExpressionInstructions(node, "SDIV");
+        }
         return null;
+    }
+
+    private String writeEqualityExpressionInstructions(EqualityExpressionNode node) {
+        String register1 = stack.pop("X");
+        String register2 = stack.pop("X");
+
+        String operand1 = (String) node.getLeft().accept(this);
+        String operand2 = (String) node.getRight().accept(this);
+
+        assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
+        assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
+
+        if (operand1.contains("X")) { stack.push("X", operand1); }
+        if (operand2.contains("X")) { stack.push("X", operand2); }
+
+        stack.push("X", register2);
+        stack.push("X", register1);
+
+        return ("   CMP " + register1 + ", " + register2 +"\n");
     }
 
 
@@ -394,7 +416,12 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
-
+        String condition = (String) node.getCondition().accept(this);
+        assemblyCode.append("loop: "+ condition);
+        assemblyCode.append("   B.EQ loopdone\n");
+        node.getBody().accept(this);
+        assemblyCode.append("   B loop\n");
+        assemblyCode.append("loopdone:\n");
         return null;
     }
 
