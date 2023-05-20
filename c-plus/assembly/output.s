@@ -8,62 +8,32 @@ _start:
 
 f: STP LR, FP, [SP, #-16]! //Push LR, FP onto stack
    // Make room for local variables and potential parameter
-   SUB FP, SP, #32
-   SUB SP, SP, #32
+   SUB FP, SP, #16
+   SUB SP, SP, #16
 
-   STR X0, [FP] // Push parameter to stack
+   STR X0, [FP, #-0] // Push parameter to stack
    // Declare b
    MOV X1, #1
-   STR X1, [FP]
+   STR X1, [FP, #-8]
 
-   // Declare c
-   MOV X1, #1
-   STR X1, [FP]
+   LDR X1, [FP, #-8] // Load b
+   LDR X5, [FP, #-8] // Load b
+   MOV X2, X5
+   MOV X3, #2
+   ADD X4, X2, X3
 
-   // Declare d
-   MOV X1, #1
-   STR X1, [FP]
-
-   MOV X4, #1
-   MOV X5, #2
-   MUL X6, X4, X5
-
-   MOV X4, #2
-   MOV X5, #3
-   MUL X7, X4, X5
-
-   MOV X1, X6
-   MOV X2, X7
-   ADD X3, X1, X2
-
-   MOV X0, X3// Load return value into X0 register
-   ADD SP, SP, #32
+   LDR X2, [FP, #-8] // Load b
+   MOV X0, X2// Load return value into X0 register
+   ADD SP, SP, #16
    LDP LR, FP, [SP], #16 // Restore LR, FP
    RET
 
 main:
    // Make room for local variables and potential parameter
-   SUB FP, SP, #16
-   SUB SP, SP, #16
+   SUB FP, SP, #0
+   SUB SP, SP, #0
 
-   // Declare i
-   MOV X8, #1
-   MOV X9, #5
-   MUL X10, X8, X9
-
-   MOV X6, X10
-   MOV X4, #2
-   ADD X5, X6, X4
-
-   MOV X0, X5 // Load parameter into X0
-   BL f
-   MOV X1, #1
-   MOV X2, X0 // Register of function return value
-   ADD X7, X1, X2
-
-   STR X7, [FP]
-
-   ADD SP, SP, #16
+   ADD SP, SP, #0
 
    MOV X16, #4
    SVC #0x80

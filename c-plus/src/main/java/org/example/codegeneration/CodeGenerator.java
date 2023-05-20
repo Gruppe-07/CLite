@@ -11,6 +11,7 @@ import java.util.Objects;
 public class CodeGenerator extends AstVisitor {
     private StringBuilder assemblyCode;
     private RegisterStack stack;
+    private VariableTable currentTable;
 
     public int getStackSpace() {
         return stackSpace;
@@ -19,9 +20,18 @@ public class CodeGenerator extends AstVisitor {
     private int stackSpace; //Variable to keep track of allocated stack space
     public void addStackSpace(int amount) {stackSpace+= amount;} //Stack must be 16-byte aligned
     public void removeStackSpace(int amount) {stackSpace-= amount;}
+
+    public void enterScope() {
+        setCurrentTable(getCurrentTable().enterScope());
+    }
+
+    public void exitScope() {
+        setCurrentTable(getCurrentTable().getParent());
+    }
     public void generateCode(TranslationUnitNode node) {
         assemblyCode = new StringBuilder();
         stack = new RegisterStack();
+        currentTable = new VariableTable(null);
         stackSpace = 0;
 
         for (int i = 30; i >= 0; i--)  {
@@ -126,6 +136,7 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
+        //TODO ensure that variables aren't loaded twice and
         node.getLeft().accept(this);
         node.getRight().accept(this);
         return null;
@@ -164,9 +175,10 @@ public class CodeGenerator extends AstVisitor {
             resultRegister = varRegister;
         }
 
-        //TODO store variable correctly on stack
-        assemblyCode.append("   STR " + resultRegister +", [FP]\n\n");
+        int address = currentTable.getVariableCount() * 8;
 
+        assemblyCode.append("   STR " + resultRegister +", [FP, #-" + address + "]\n\n");
+        currentTable.addVariable(identifier, String.valueOf(address));
 
         stack.push("X", resultRegister);
 
@@ -195,11 +207,14 @@ public class CodeGenerator extends AstVisitor {
         }
 
         assemblyCode.append("   BL " + name + "\n");
-        return "X0 // Register of function return value";
+        return "X0 // X0 = Register of function return value";
     }
 
     @Override
     public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
+
+        enterScope();
+
         String name = node.getIdentifierNode().getName();
         int localVariableCount = getLocalVariableCount(node);
 
@@ -223,14 +238,19 @@ public class CodeGenerator extends AstVisitor {
             addStackSpace(getSpaceToAdd(localVariableCount));
 
             if (node.getParameter() != null) {
-                assemblyCode.append("   STR X0, [FP] // Push parameter to stack\n");
-                //TODO Add local variable to scope
+                int address = currentTable.getVariableCount() * 8;
+                assemblyCode.append("   STR X0, [FP, #-"+ address +"] // Push parameter to stack\n");
+                getCurrentTable().addVariable(node.getParameter().getIdentifierNode().getName(), String.valueOf(address));
             }
             node.getBody().accept(this);
             assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
             assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
             assemblyCode.append("   RET\n\n");
         }
+
+        removeStackSpace(getSpaceToAdd(localVariableCount));
+
+        exitScope();
 
         return null;
     }
@@ -256,7 +276,14 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitIdentifierNode(IdentifierNode node) {
-        return node.getName();
+        String name = node.getName();
+        String address = currentTable.lookupVariable(name);
+
+        String resultRegister = stack.pop("X");
+
+        assemblyCode.append("   LDR " + resultRegister + ", [FP, #-" + address + "] // Load "+ name +"\n");
+
+        return resultRegister;
     }
 
     @Override
@@ -386,5 +413,13 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public String visitConstantNode(ConstantNode node) {
         return (String) node.accept(this);
+    }
+
+    public VariableTable getCurrentTable() {
+        return currentTable;
+    }
+
+    public void setCurrentTable(VariableTable currentTable) {
+        this.currentTable = currentTable;
     }
 }

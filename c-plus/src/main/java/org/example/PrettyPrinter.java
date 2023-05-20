@@ -222,7 +222,7 @@ public class PrettyPrinter extends AstVisitor{
         indent();
 
         visitTypeSpecifierNode(node.getType());
-        visitIdentifierNode(node.getName());
+        visitIdentifierNode(node.getIdentifierNode());
 
         dedent();
 

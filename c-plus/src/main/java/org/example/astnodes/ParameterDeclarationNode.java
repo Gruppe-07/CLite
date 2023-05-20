@@ -4,11 +4,11 @@ import org.example.AstVisitor;
 
 public class ParameterDeclarationNode extends AstNode {
     public TypeSpecifierNode type;
-    public IdentifierNode name;
+    public IdentifierNode identifierNode;
 
     public ParameterDeclarationNode(TypeSpecifierNode type, IdentifierNode name) {
         this.type = type;
-        this.name = name;
+        this.identifierNode = name;
     }
 
     public ParameterDeclarationNode() {
@@ -22,12 +22,12 @@ public class ParameterDeclarationNode extends AstNode {
         this.type = type;
     }
 
-    public IdentifierNode getName() {
-        return name;
+    public IdentifierNode getIdentifierNode() {
+        return identifierNode;
     }
 
-    public void setName(IdentifierNode name) {
-        this.name = name;
+    public void setIdentifierNode(IdentifierNode identifierNode) {
+        this.identifierNode = identifierNode;
     }
 
     @Override

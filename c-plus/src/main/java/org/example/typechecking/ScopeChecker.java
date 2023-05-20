@@ -167,7 +167,7 @@ public class ScopeChecker extends AstVisitor {
         //Create parameter symbol if function has parameter
         VariableSymbol paramSymbol = null;
         if (node.getParameter() != null) {
-            String paramName = node.getParameter().getName().getName();
+            String paramName = node.getParameter().getIdentifierNode().getName();
             Type parmType = Type.valueOf(node.getParameter().getType().getType().toUpperCase());
 
             paramSymbol = new VariableSymbol(paramName, parmType);
