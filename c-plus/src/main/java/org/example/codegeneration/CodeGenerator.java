@@ -310,7 +310,14 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitIfElseNode(IfElseNode node) {
-
+        String condition = (String) node.getCondition().accept(this);
+        assemblyCode.append(condition);
+        assemblyCode.append("   B.GE elseclause\n");
+        node.getIfBranch().accept(this);
+        assemblyCode.append("   B endif\n");
+        assemblyCode.append("elseclause: \n");
+        if (node.getElseBranch() != null) {node.getElseBranch().accept(this);}
+        assemblyCode.append("endif:\n");
         return null;
     }
 
