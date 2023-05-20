@@ -9,7 +9,6 @@ public abstract class AstVisitor {
     public abstract Object visitCompoundStatementNode(CompoundStatementNode node);
     public abstract Object visitDeclarationNode(DeclarationNode node);
     public abstract Object visitEqualityExpressionNode(EqualityExpressionNode node);
-    public abstract Object visitExternalDeclarationNode(ExternalDeclarationNode node);
     public abstract Object visitFloatConstantNode(FloatConstantNode node);
     //public abstract Object visitForLoopNode(ForLoopNode node);
     public abstract Object visitFunctionCallNode(FunctionCallNode node);

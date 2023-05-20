@@ -19,16 +19,11 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public TranslationUnitNode visitTranslationUnit(CLiteParser.TranslationUnitContext ctx) {
-        List<ExternalDeclarationNode> externalDeclarationNodeList = new ArrayList<>();
-        for (CLiteParser.ExternalDeclarationContext child : ctx.externalDeclaration()) {
-            externalDeclarationNodeList.add(visitExternalDeclaration(child));
+        List<FunctionDefinitionNode> functionDefinitionNodeList = new ArrayList<>();
+        for (CLiteParser.FunctionDefinitionContext child : ctx.functionDefinition()) {
+            functionDefinitionNodeList.add(visitFunctionDefinition(child));
         }
-        return new TranslationUnitNode(externalDeclarationNodeList);
-    }
-
-    @Override
-    public ExternalDeclarationNode visitExternalDeclaration(CLiteParser.ExternalDeclarationContext ctx) {
-        return new ExternalDeclarationNode(ctx.getChild(0).accept(this));
+        return new TranslationUnitNode(functionDefinitionNodeList);
     }
 
     @Override

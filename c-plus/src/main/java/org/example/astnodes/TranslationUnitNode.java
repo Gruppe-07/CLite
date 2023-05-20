@@ -5,14 +5,14 @@ import org.example.AstVisitor;
 import java.util.List;
 
 public class TranslationUnitNode extends AstNode {
-    public List<ExternalDeclarationNode> externalDeclarationNodeList;
+    public List<FunctionDefinitionNode> functionDefinitionNodeList;
 
-    public TranslationUnitNode(List<ExternalDeclarationNode> externalDeclarationNodeList) {
-        this.externalDeclarationNodeList = externalDeclarationNodeList;
+    public TranslationUnitNode(List<FunctionDefinitionNode> functionDefinitionNodeList) {
+        this.functionDefinitionNodeList = functionDefinitionNodeList;
     }
 
-    public List<ExternalDeclarationNode> getExternalDeclarationNodeList() {
-        return externalDeclarationNodeList;
+    public List<FunctionDefinitionNode> getFunctionDefinitionNodeList() {
+        return functionDefinitionNodeList;
     }
 
     @Override

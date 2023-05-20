@@ -83,13 +83,7 @@ grammar CLite;
 
 
     translationUnit
-        :   externalDeclaration+
-        ;
-
-
-    externalDeclaration
-        :   functionDefinition
-        |   declaration
+        :   functionDefinition+
         ;
 
     functionDefinition

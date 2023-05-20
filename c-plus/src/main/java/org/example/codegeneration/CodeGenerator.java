@@ -5,6 +5,7 @@ import org.example.astnodes.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class CodeGenerator extends AstVisitor {
@@ -17,6 +18,8 @@ public class CodeGenerator extends AstVisitor {
         for (int i = 30; i >= 0; i--)  {
             stack.push("W",  "W" + i);
             stack.push("X",  "X" + i);
+            //Reserved registers are popped from the stack
+            if (i == 18 || i == 29 || i == 0) {stack.pop("X");}
 
         }
 
@@ -26,17 +29,19 @@ public class CodeGenerator extends AstVisitor {
 
                 _start:
                 """);
+        assemblyCode.append("   B main\n\n");
 
         visitTranslationUnitNode(node);
 
         assemblyCode.append(
                 """
-                           mov X16, #4
-                           svc #0x80
+                           MOV X16, #4
+                           SVC #0x80
 
-                           mov     X0, #0
-                           mov     X16, #1
-                           svc     #0x80
+                           MOV     X0, #0
+                           MOV     X16, #1
+                           SVC     #0x80
+                           
                         """);
 
         writeToFile("assembly/output.s", assemblyCode.toString());
@@ -110,7 +115,8 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
-
+        node.getLeft().accept(this);
+        node.getRight().accept(this);
         return null;
     }
 
@@ -121,7 +127,9 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitCompoundStatementNode(CompoundStatementNode node) {
-
+        for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
+            blockItemNode.accept(this);
+        }
 
         return null;
     }
@@ -134,6 +142,11 @@ public class CodeGenerator extends AstVisitor {
 
         String resultRegister = (String) node.getValue().accept(this);
         if (!(resultRegister.contains("X"))) {
+            String varRegister = stack.pop("X");
+
+            assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
+            resultRegister = varRegister;
+        } else if (resultRegister.contains("function return value")) {
             String varRegister = stack.pop("X");
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
@@ -155,11 +168,6 @@ public class CodeGenerator extends AstVisitor {
         return null;
     }
 
-    @Override
-    public Object visitExternalDeclarationNode(ExternalDeclarationNode node) {
-        node.getFuncDefOrDecl().accept(this);
-        return null;
-    }
 
     @Override
     public String visitFloatConstantNode(FloatConstantNode node) {
@@ -168,17 +176,35 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitFunctionCallNode(FunctionCallNode node) {
+        String name = node.getIdentifierNode().getName();
 
-        return null;
+        if (node.getCallValue() != null) { node.getCallValue().accept(this); }
+
+        assemblyCode.append("   BL " + name + "\n");
+        return "X0 // Register of function return value";
     }
 
     @Override
     public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String name = node.getIdentifierNode().getName();
 
-        assemblyCode.append(name+ ":\n");
+        if (node.getParameter() != null) { node.getParameter().accept(this); }
 
-        node.getBody().accept(this);
+        if (Objects.equals(name, "main")) {
+
+            assemblyCode.append(name + ":\n");
+            node.getBody().accept(this);
+
+        } else {
+            assemblyCode.append(name + ": STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+            assemblyCode.append("   SUB FP, SP, #16\n");
+            assemblyCode.append("   SUB SP, SP, #16\n\n");
+            node.getBody().accept(this);
+
+            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+            assemblyCode.append("   RET\n\n");
+        }
+
         return null;
     }
 
@@ -269,14 +295,16 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitReturnStatementNode(ReturnStatementNode node) {
-
+        String value = (String) node.getReturnValue().accept(this);
+        assemblyCode.append("   // Load return value into X0 register\n");
+        assemblyCode.append("   MOV X0, " + value + "\n");
         return null;
     }
 
     @Override
     public Object visitTranslationUnitNode(TranslationUnitNode node) {
-        for(ExternalDeclarationNode externalDeclarationNode : node.getExternalDeclarationNodeList()) {
-            externalDeclarationNode.accept(this);
+        for(FunctionDefinitionNode functionDefinitionNode : node.getFunctionDefinitionNodeList()) {
+            functionDefinitionNode.accept(this);
         }
         return null;
     }
@@ -300,13 +328,13 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitExpressionStatementNode(ExpressionStatementNode node) {
-
+        node.getExpressionNode().accept(this);
         return null;
     }
 
     @Override
     public Object visitExpressionNode(ExpressionNode node) {
-
+        node.accept(this);
         return null;
     }
 

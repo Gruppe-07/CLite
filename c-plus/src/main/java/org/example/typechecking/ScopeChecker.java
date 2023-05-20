@@ -105,11 +105,6 @@ public class ScopeChecker extends AstVisitor {
         return null;
     }
 
-    @Override
-    public Object visitExternalDeclarationNode(ExternalDeclarationNode node) {
-        node.getFuncDefOrDecl().accept(this);
-        return null;
-    }
 
     @Override
     public Object visitFloatConstantNode(FloatConstantNode node) {
@@ -135,6 +130,16 @@ public class ScopeChecker extends AstVisitor {
             }
             if (symbol.getTypeSpecifier() != getCurrentType()) {
                 throw new RuntimeException(getCurrentType().name().toLowerCase() + " does not match function return type");
+            }
+            if (symbol.getParameterSymbol() != null && node.getCallValue() != null) {
+                Type paramType = symbol.getParameterSymbol().getType();
+                node.getCallValue().accept(this);
+                if (getCurrentType() != paramType) {
+                    throw new RuntimeException("Function parameter does not match call value");
+                }
+            }
+            if (symbol.getParameterSymbol() == null && node.getCallValue() != null) {
+                throw new RuntimeException("Function has no parameter");
             }
         }
 
@@ -196,7 +201,6 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public Object visitIdentifierNode(IdentifierNode node) {
-        System.out.println("Visit identifier");
         String name = node.getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
@@ -295,8 +299,8 @@ public class ScopeChecker extends AstVisitor {
 
     @Override
     public Object visitTranslationUnitNode(TranslationUnitNode node) {
-        for (ExternalDeclarationNode externalDeclarationNode : node.getExternalDeclarationNodeList()) {
-            externalDeclarationNode.accept(this);
+        for (FunctionDefinitionNode functionDefinitionNode : node.getFunctionDefinitionNodeList()) {
+            functionDefinitionNode.accept(this);
         }
         return null;
     }

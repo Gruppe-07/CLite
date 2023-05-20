@@ -93,16 +93,6 @@ public class PrettyPrinter extends AstVisitor{
         return null;
     }
 
-    @Override
-    public Object visitExternalDeclarationNode(ExternalDeclarationNode node) {
-        System.out.println(getIndentString() + node.getClass().getSimpleName());
-        indent();
-
-        node.getFuncDefOrDecl().accept(this);
-
-        dedent();;
-        return null;
-    }
 
     @Override
     public Object visitFloatConstantNode(FloatConstantNode node) {
@@ -295,8 +285,8 @@ public class PrettyPrinter extends AstVisitor{
         System.out.println(node.getClass().getSimpleName());
         indent();
 
-        for (ExternalDeclarationNode child : node.getExternalDeclarationNodeList()) {
-            visitExternalDeclarationNode(child);
+        for (FunctionDefinitionNode child : node.getFunctionDefinitionNodeList()) {
+            visitFunctionDefinitionNode(child);
         }
         dedent();
         return null;

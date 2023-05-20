@@ -5,6 +5,11 @@ import org.example.typechecking.Type;
 public class FunctionDefinitionSymbol extends Symbol{
 
     private Type typeSpecifier;
+
+    public Symbol getParameterSymbol() {
+        return parameterSymbol;
+    }
+
     private Symbol parameterSymbol;
 
     public FunctionDefinitionSymbol(String name, Type type, Type typeSpecifier, Symbol parameterSymbol) {
