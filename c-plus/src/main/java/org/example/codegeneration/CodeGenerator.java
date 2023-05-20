@@ -11,9 +11,18 @@ import java.util.Objects;
 public class CodeGenerator extends AstVisitor {
     private StringBuilder assemblyCode;
     private RegisterStack stack;
+
+    public int getStackSpace() {
+        return stackSpace;
+    }
+
+    private int stackSpace; //Variable to keep track of allocated stack space
+    public void addStackSpace(int amount) {stackSpace+= amount;} //Stack must be 16-byte aligned
+    public void removeStackSpace(int amount) {stackSpace-= amount;}
     public void generateCode(TranslationUnitNode node) {
         assemblyCode = new StringBuilder();
         stack = new RegisterStack();
+        stackSpace = 0;
 
         for (int i = 30; i >= 0; i--)  {
             stack.push("W",  "W" + i);
@@ -26,6 +35,8 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("""
                 .global _start
                 .align 2
+                   .equ VAR, 0
+                   .equ RETURN, 8
 
                 _start:
                 """);
@@ -152,8 +163,8 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
         }
-        assemblyCode.append("   SUB FP, SP, #16\n");
-        assemblyCode.append("   SUB SP, SP, #16\n");
+
+        //TODO store variable correctly on stack
         assemblyCode.append("   STR " + resultRegister +", [FP]\n\n");
 
 
@@ -178,7 +189,10 @@ public class CodeGenerator extends AstVisitor {
     public Object visitFunctionCallNode(FunctionCallNode node) {
         String name = node.getIdentifierNode().getName();
 
-        if (node.getCallValue() != null) { node.getCallValue().accept(this); }
+        if (node.getCallValue() != null) {
+            String resultRegister = (String) node.getCallValue().accept(this);
+            assemblyCode.append("   MOV X0, " + resultRegister + " // Load parameter into X0\n");
+        }
 
         assemblyCode.append("   BL " + name + "\n");
         return "X0 // Register of function return value";
@@ -187,25 +201,57 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         String name = node.getIdentifierNode().getName();
+        int localVariableCount = getLocalVariableCount(node);
 
-        if (node.getParameter() != null) { node.getParameter().accept(this); }
+        if (node.getParameter() != null) { node.getParameter().accept(this); localVariableCount++;}
 
         if (Objects.equals(name, "main")) {
-
+            int spaceToAdd = getSpaceToAdd(localVariableCount);
             assemblyCode.append(name + ":\n");
+            assemblyCode.append("   // Make room for local variables and potential parameter\n");
+            assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
+            assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
             node.getBody().accept(this);
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n\n");
 
         } else {
+            int spaceToAdd = getSpaceToAdd(localVariableCount);
             assemblyCode.append(name + ": STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-            assemblyCode.append("   SUB FP, SP, #16\n");
-            assemblyCode.append("   SUB SP, SP, #16\n\n");
-            node.getBody().accept(this);
+            assemblyCode.append("   // Make room for local variables and potential parameter\n");
+            assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
+            assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
+            addStackSpace(getSpaceToAdd(localVariableCount));
 
+            if (node.getParameter() != null) {
+                assemblyCode.append("   STR X0, [FP] // Push parameter to stack\n");
+                //TODO Add local variable to scope
+            }
+            node.getBody().accept(this);
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
             assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
             assemblyCode.append("   RET\n\n");
         }
 
         return null;
+    }
+
+    public int getSpaceToAdd(int variables) {
+        //One variable requires 8 bytes. Stack must be 16 byte aligned
+        return (int) Math.ceil(((double) variables / 2)) * 16;
+    }
+
+    public int getLocalVariableCount(FunctionDefinitionNode node) {
+        return countDeclarations(node.getBody());
+    }
+
+    public int countDeclarations(CompoundStatementNode node) {
+        int count = 0;
+        for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
+            if (blockItemNode instanceof DeclarationNode) {
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override
@@ -296,8 +342,7 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public Object visitReturnStatementNode(ReturnStatementNode node) {
         String value = (String) node.getReturnValue().accept(this);
-        assemblyCode.append("   // Load return value into X0 register\n");
-        assemblyCode.append("   MOV X0, " + value + "\n");
+        assemblyCode.append("   MOV X0, " + value + "// Load return value into X0 register\n");
         return null;
     }
 

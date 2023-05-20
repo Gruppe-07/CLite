@@ -102,8 +102,7 @@ grammar CLite;
 
 
     statement
-        :   compoundStatement
-        |   expressionStatement
+        :   expressionStatement
         |   selectionStatement
         |   iterationStatement
         |   jumpStatement

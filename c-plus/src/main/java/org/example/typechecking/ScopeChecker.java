@@ -141,6 +141,9 @@ public class ScopeChecker extends AstVisitor {
             if (symbol.getParameterSymbol() == null && node.getCallValue() != null) {
                 throw new RuntimeException("Function has no parameter");
             }
+            if (symbol.getParameterSymbol() != null && node.getCallValue() == null) {
+                throw new RuntimeException("Function requires a call value");
+            }
         }
 
         if (node.getCallValue() != null) {
