@@ -46,26 +46,29 @@ public class ScopeChecker extends AstVisitor {
 
 
     @Override
-    public void visitAdditiveExpressionNode(AdditiveExpressionNode node) {
-        node.getLeft().accept(this);
-        node.getLeft().accept(this);
-    }
-
-    @Override
-    public void visitAssignmentExpressionNode(AssignmentExpressionNode node) {
+    public Object visitAdditiveExpressionNode(AdditiveExpressionNode node) {
         node.getLeft().accept(this);
         node.getRight().accept(this);
+        return null;
     }
 
     @Override
-    public void visitCharacterConstantNode(CharacterConstantNode node) {
+    public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
+        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterConstantNode(CharacterConstantNode node) {
         if (getCurrentType() != Type.STRING) {
             throw new RuntimeException("Operand does not match type: " + getCurrentType());
         }
+        return null;
     }
 
     @Override
-    public void visitCompoundStatementNode(CompoundStatementNode node) {
+    public Object visitCompoundStatementNode(CompoundStatementNode node) {
         enterScope();
 
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
@@ -73,10 +76,11 @@ public class ScopeChecker extends AstVisitor {
         }
 
         exitScope();
+        return null;
     }
 
     @Override
-    public void visitDeclarationNode(DeclarationNode node) {
+    public Object visitDeclarationNode(DeclarationNode node) {
         String name = node.getIdentifierNode().getName();
         Type type = Type.valueOf(node.getTypeSpecifierNode().getType().toUpperCase());
 
@@ -91,31 +95,29 @@ public class ScopeChecker extends AstVisitor {
         else {throw new RuntimeException("Variable already defined");}
 
         setCurrentType(null);
+        return null;
     }
 
     @Override
-    public void visitEqualityExpressionNode(EqualityExpressionNode node) {
+    public Object visitEqualityExpressionNode(EqualityExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
     }
 
-    @Override
-    public void visitExternalDeclarationNode(ExternalDeclarationNode node) {
-        node.getFuncDefOrDecl().accept(this);
-    }
 
     @Override
-    public void visitFloatConstantNode(FloatConstantNode node) {
+    public Object visitFloatConstantNode(FloatConstantNode node) {
         if (getCurrentType() != Type.DOUBLE && getCurrentType() != null) {
             throw new RuntimeException("Operand does not match type: " + getCurrentType());
         }
         if (getCurrentType() == null) {setCurrentType(Type.DOUBLE);}
+        return null;
     }
 
 
     @Override
-    public void visitFunctionCallNode(FunctionCallNode node) {
-
+    public Object visitFunctionCallNode(FunctionCallNode node) {
         String name = node.getIdentifierNode().getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
@@ -129,15 +131,29 @@ public class ScopeChecker extends AstVisitor {
             if (symbol.getTypeSpecifier() != getCurrentType()) {
                 throw new RuntimeException(getCurrentType().name().toLowerCase() + " does not match function return type");
             }
+            if (symbol.getParameterSymbol() != null && node.getCallValue() != null) {
+                Type paramType = symbol.getParameterSymbol().getType();
+                node.getCallValue().accept(this);
+                if (getCurrentType() != paramType) {
+                    throw new RuntimeException("Function parameter does not match call value");
+                }
+            }
+            if (symbol.getParameterSymbol() == null && node.getCallValue() != null) {
+                throw new RuntimeException("Function has no parameter");
+            }
+            if (symbol.getParameterSymbol() != null && node.getCallValue() == null) {
+                throw new RuntimeException("Function requires a call value");
+            }
         }
 
         if (node.getCallValue() != null) {
             node.getCallValue().accept(this);
         }
+        return null;
     }
 
     @Override
-    public void visitFunctionDefinitionNode(FunctionDefinitionNode node) {
+    public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
         Type typeSpecifier = Type.valueOf(node.getTypeSpecifierNode().getType().toUpperCase());
         String functionName = node.getIdentifierNode().getName();
 
@@ -151,7 +167,7 @@ public class ScopeChecker extends AstVisitor {
         //Create parameter symbol if function has parameter
         VariableSymbol paramSymbol = null;
         if (node.getParameter() != null) {
-            String paramName = node.getParameter().getName().getName();
+            String paramName = node.getParameter().getIdentifierNode().getName();
             Type parmType = Type.valueOf(node.getParameter().getType().getType().toUpperCase());
 
             paramSymbol = new VariableSymbol(paramName, parmType);
@@ -168,6 +184,7 @@ public class ScopeChecker extends AstVisitor {
 
         setFunctionType(null);
 
+        return null;
     }
 
     public void visitFunctionBody(CompoundStatementNode node, VariableSymbol paramSymbol) {
@@ -186,7 +203,7 @@ public class ScopeChecker extends AstVisitor {
 
 
     @Override
-    public void visitIdentifierNode(IdentifierNode node) {
+    public Object visitIdentifierNode(IdentifierNode node) {
         String name = node.getName();
 
         if (getCurrentScope().lookupSymbol(name) == null) {
@@ -198,10 +215,11 @@ public class ScopeChecker extends AstVisitor {
             Type thisType = symbol.getType();
             setCurrentType(thisType);
         }
+        return null;
     }
 
     @Override
-    public void visitIfElseNode(IfElseNode node) {
+    public Object visitIfElseNode(IfElseNode node) {
         node.getCondition().accept(this);
 
         node.getIfBranch().accept(this);
@@ -209,114 +227,126 @@ public class ScopeChecker extends AstVisitor {
         if (node.getElseBranch() != null) {
             node.getElseBranch().accept(this);
         }
+        return null;
     }
 
     @Override
-    public void visitIntegerConstantNode(IntegerConstantNode node) {
+    public Object visitIntegerConstantNode(IntegerConstantNode node) {
         if (getCurrentType() != Type.INT && getCurrentType() != null) {
             throw new RuntimeException("Operand does not match type: " + getCurrentType());
         }
         if (getCurrentType() == null) {setCurrentType(Type.INT);}
+        return null;
     }
 
     @Override
-    public void visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
+    public Object visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
     }
 
     @Override
-    public void visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
+    public Object visitLogicalOrExpressionNode(LogicalOrExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
     }
 
     @Override
-    public void visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
+    public Object visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
     }
 
     @Override
-    public void visitNegationNode(NegationNode node) {
+    public Object visitNegationNode(NegationNode node) {
         node.getInnerExpressionNode().accept(this);
+        return null;
     }
 
     @Override
-    public void visitParameterDeclarationNode(ParameterDeclarationNode node) {
-        Type type = Type.valueOf(node.getType().getType().toUpperCase());
-        String name = node.getName().getName();
+    public Object visitParameterDeclarationNode(ParameterDeclarationNode node) {
+        return null;
     }
 
     @Override
-    public void visitParensExpressionNode(ParensExpressionNode node) {
+    public Object visitParensExpressionNode(ParensExpressionNode node) {
         node.getInnerExpressionNode().accept(this);
+        return null;
     }
 
     @Override
-    public void visitPostFixExpressionNode(PostFixExpressionNode node) {
+    public Object visitPostFixExpressionNode(PostFixExpressionNode node) {
         node.getIdentifierOrConstant().accept(this);
+        return null;
     }
 
     @Override
-    public void visitRelationalExpressionNode(RelationalExpressionNode node) {
+    public Object visitRelationalExpressionNode(RelationalExpressionNode node) {
         node.getLeft().accept(this);
-        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        return null;
     }
 
     @Override
-    public void visitReturnStatementNode(ReturnStatementNode node) {
+    public Object visitReturnStatementNode(ReturnStatementNode node) {
         if (node.getReturnValue() != null) {
             setCurrentType(functionType);
             node.getReturnValue().accept(this);
             setCurrentType(null);
         }
+        return null;
     }
 
     @Override
-    public void visitTranslationUnitNode(TranslationUnitNode node) {
-        for (ExternalDeclarationNode externalDeclarationNode : node.getExternalDeclarationNodeList()) {
-            externalDeclarationNode.accept(this);
+    public Object visitTranslationUnitNode(TranslationUnitNode node) {
+        for (FunctionDefinitionNode functionDefinitionNode : node.getFunctionDefinitionNodeList()) {
+            functionDefinitionNode.accept(this);
         }
+        return null;
     }
 
     @Override
-    public void visitTypeSpecifierNode(TypeSpecifierNode node) {
+    public Object visitTypeSpecifierNode(TypeSpecifierNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitUnaryExpressionNode(UnaryExpressionNode node) {
+    public Object visitUnaryExpressionNode(UnaryExpressionNode node) {
 
+        return null;
     }
 
     @Override
-    public void visitWhileLoopNode(WhileLoopNode node) {
+    public Object visitWhileLoopNode(WhileLoopNode node) {
         node.getCondition().accept(this);
 
         node.getBody().accept(this);
+        return null;
     }
 
     @Override
-    public void visitExpressionStatementNode(ExpressionStatementNode node) {
+    public Object visitExpressionStatementNode(ExpressionStatementNode node) {
         setCurrentType(null);
         visitExpressionNode(node.getExpressionNode());
+        return null;
     }
 
     @Override
-    public void visitExpressionNode(ExpressionNode node) {
+    public Object visitExpressionNode(ExpressionNode node) {
         setCurrentType(null);
         node.accept(this);
 
+        return null;
     }
 
     @Override
-    public void visitConstantNode(ConstantNode node) {
+    public Object visitConstantNode(ConstantNode node) {
 
-    }
-
-    public Type getFunctionType() {
-        return functionType;
+        return null;
     }
 
     public void setFunctionType(Type functionType) {

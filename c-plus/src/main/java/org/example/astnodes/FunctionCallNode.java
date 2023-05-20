@@ -24,7 +24,7 @@ public class FunctionCallNode extends ExpressionNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitFunctionCallNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitFunctionCallNode(this);
     }
 }

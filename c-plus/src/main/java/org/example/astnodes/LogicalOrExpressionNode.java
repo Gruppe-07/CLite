@@ -6,7 +6,7 @@ import java.util.List;
 public class LogicalOrExpressionNode extends BinaryExpressionNode {
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitLogicalOrExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitLogicalOrExpressionNode(this);
     }
 }

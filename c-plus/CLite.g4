@@ -83,13 +83,7 @@ grammar CLite;
 
 
     translationUnit
-        :   externalDeclaration+
-        ;
-
-
-    externalDeclaration
-        :   functionDefinition
-        |   declaration
+        :   functionDefinition+
         ;
 
     functionDefinition
@@ -108,8 +102,7 @@ grammar CLite;
 
 
     statement
-        :   compoundStatement
-        |   expressionStatement
+        :   expressionStatement
         |   selectionStatement
         |   iterationStatement
         |   jumpStatement

@@ -4,7 +4,6 @@ import java.util.Stack;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 public class RegisterStack {
     private Map<String, Stack<String>> registerStacks;

@@ -7,8 +7,8 @@ public class EqualityExpressionNode extends BinaryExpressionNode {
 
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitEqualityExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitEqualityExpressionNode(this);
     }
 }
 

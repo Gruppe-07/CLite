@@ -3,6 +3,7 @@ package org.example.astnodes;
 import org.example.AstVisitor;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CompoundStatementNode extends StatementNode {
     public List<BlockItemNode> blockItemList;
@@ -20,7 +21,7 @@ public class CompoundStatementNode extends StatementNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitCompoundStatementNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitCompoundStatementNode(this);
     }
 }

@@ -20,7 +20,7 @@ public class AssignmentExpressionNode extends ExpressionNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitAssignmentExpressionNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitAssignmentExpressionNode(this);
     }
 }

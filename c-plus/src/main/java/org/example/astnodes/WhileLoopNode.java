@@ -21,7 +21,7 @@ public class WhileLoopNode extends StatementNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitWhileLoopNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitWhileLoopNode(this);
     }
 }

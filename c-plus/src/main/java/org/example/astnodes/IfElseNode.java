@@ -45,7 +45,7 @@ public class IfElseNode extends StatementNode {
 
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitIfElseNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitIfElseNode(this);
     }
 }

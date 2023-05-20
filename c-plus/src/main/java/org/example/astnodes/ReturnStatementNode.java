@@ -24,8 +24,8 @@ public class ReturnStatementNode extends StatementNode {
     }
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitReturnStatementNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitReturnStatementNode(this);
     }
 }
 

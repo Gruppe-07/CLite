@@ -4,5 +4,5 @@ import org.example.AstVisitor;
 
 public abstract class AstNode {
 
-    public void accept(AstVisitor visitor){}
+    public Object accept(AstVisitor visitor){ return null;}
 }

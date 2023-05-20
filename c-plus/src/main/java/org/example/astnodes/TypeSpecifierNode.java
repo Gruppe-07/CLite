@@ -15,7 +15,7 @@ public class TypeSpecifierNode extends AstNode {
 
 
     @Override
-    public void accept(AstVisitor visitor) {
-        visitor.visitTypeSpecifierNode(this);
+    public Object accept(AstVisitor visitor) {
+        return visitor.visitTypeSpecifierNode(this);
     }
 }
