@@ -19,7 +19,6 @@ public class CodeGenerator extends AstVisitor {
             stack.push("X",  "X" + i);
 
         }
-        System.out.println(stack);
 
         assemblyCode.append("""
                 .global _start
@@ -70,21 +69,36 @@ public class CodeGenerator extends AstVisitor {
     }
 
     private String writeBinaryExpressionInstructions(BinaryExpressionNode node, String operation) {
-        String operand1 = (String) node.getLeft().accept(this);
-        String operand2 = (String) node.getRight().accept(this);
-
         String register1 = stack.pop("X");
         String register2 = stack.pop("X");
 
-        if (operand1.contains("X")) { stack.push("X", operand1); }
-        if (operand2.contains("X")) { stack.push("X", operand2); }
-
         String resultRegister = stack.pop("X");
+
+        String operand1 = (String) node.getLeft().accept(this);
+        String operand2 = (String) node.getRight().accept(this);
+
+        //If operand1 is a variable
+        if (!(operand1.contains("#")) && !(operand1.contains("X"))) {
+            //TODO lookup address and set operand1 as variable address
+            operand1 = "address";
+            assemblyCode.append("   LDR \n");
+        }
+
+        //If operand2 is a variable
+        if (!(operand2.contains("#")) && !(operand2.contains("X"))) {
+            //TODO lookup address and set operand2 as variable address
+            operand2 = "address";
+            assemblyCode.append("   LDR , \n");
+        }
+
 
         assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
         assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
 
         assemblyCode.append("   " + operation + " " + resultRegister + ", " + register1 + ", " + register2 +"\n\n");
+
+        if (operand1.contains("X")) { stack.push("X", operand1); }
+        if (operand2.contains("X")) { stack.push("X", operand2); }
 
         stack.push("X", register2);
         stack.push("X", register1);
@@ -124,7 +138,6 @@ public class CodeGenerator extends AstVisitor {
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
-            stack.push("X", varRegister);
         }
         assemblyCode.append("   SUB FP, SP, #16\n");
         assemblyCode.append("   SUB SP, SP, #16\n");
@@ -171,8 +184,6 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitIdentifierNode(IdentifierNode node) {
-        //TODO get address of variable and return
-        assemblyCode.append("   LDR\n");
         return node.getName();
     }
 
