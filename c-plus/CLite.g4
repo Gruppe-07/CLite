@@ -45,10 +45,8 @@ grammar CLite;
         ;
 
     unaryExpression
-        :
-        (postfixExpression
+        :   postfixExpression
         |   unaryOperator multiplicativeExpression
-        )
         ;
 
     postfixExpression

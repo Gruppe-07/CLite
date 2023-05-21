@@ -1,6 +1,8 @@
-int main() {
-    if (1 + 2 + 3 == 5)
-    {int i = 1;}
-    else {int a = 1;}
+int f(int a) {
 
+return 1 + a;
+}
+int main() {
+    int a = f(1);
+    int i = printf(a + 1);
 }

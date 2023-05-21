@@ -41,6 +41,9 @@ public class ScopeChecker extends AstVisitor {
         return this.currentType;
     }
     public void checkScope(TranslationUnitNode node) {
+        VariableSymbol param = new VariableSymbol("a", Type.INT);
+        FunctionDefinitionSymbol printf = new FunctionDefinitionSymbol("printf", Type.FUNCTION, Type.INT, param);
+        getCurrentScope().addSymbol("printf", printf);
         visitTranslationUnitNode(node);
     }
 
@@ -119,6 +122,9 @@ public class ScopeChecker extends AstVisitor {
     @Override
     public Object visitFunctionCallNode(FunctionCallNode node) {
         String name = node.getIdentifierNode().getName();
+
+        // Temporary measure to ensure that functions can be run without being assigned to a variable
+        if (getCurrentType() == null) {setCurrentType(Type.INT);}
 
         if (getCurrentScope().lookupSymbol(name) == null) {
             throw new RuntimeException(name + " is not a defined function.");
