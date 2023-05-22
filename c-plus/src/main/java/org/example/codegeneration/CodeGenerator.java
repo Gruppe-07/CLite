@@ -450,6 +450,11 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
+    public Object visitForLoopNode(ForLoopNode node) {
+        return null;
+    }
+
+    @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
         String condition = (String) node.getCondition().accept(this);
         assemblyCode.append("loop: "+ condition);

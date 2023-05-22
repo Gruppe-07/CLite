@@ -129,6 +129,7 @@ grammar CLite;
 
     iterationStatement
         :   While '(' expression ')' compoundStatement
+        |   For '(' declaration expression ';' incrementDecrement ')' compoundStatement
         ;
 
     jumpStatement
@@ -144,6 +145,7 @@ grammar CLite;
     String : 'string';
     If : 'if';
     Return : 'return';
+    For : 'for';
     While : 'while';
     Else : 'else';
 
