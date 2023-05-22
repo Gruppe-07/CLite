@@ -6,11 +6,12 @@ import org.example.astnodes.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Stack;
 
 
 public class CodeGenerator extends AstVisitor {
     private StringBuilder assemblyCode;
-    private RegisterStack stack;
+    private Stack<String> stack;
     private VariableTable currentTable;
 
     public int getStackSpace() {
@@ -18,27 +19,36 @@ public class CodeGenerator extends AstVisitor {
     }
 
     private int stackSpace; //Variable to keep track of allocated stack space
+
+    public int getScopeLevel() {
+        return scopeLevel;
+    }
+
+    private int scopeLevel;
     public void addStackSpace(int amount) {stackSpace+= amount;} //Stack must be 16-byte aligned
     public void removeStackSpace(int amount) {stackSpace-= amount;}
 
     public void enterScope() {
+        scopeLevel++;
         setCurrentTable(getCurrentTable().enterScope());
     }
 
     public void exitScope() {
+        scopeLevel--;
         setCurrentTable(getCurrentTable().getParent());
     }
     public void generateCode(TranslationUnitNode node) {
         assemblyCode = new StringBuilder();
-        stack = new RegisterStack();
+        stack = new Stack<>();
         currentTable = new VariableTable(null);
         stackSpace = 0;
+        scopeLevel = 0;
 
         for (int i = 30; i >= 0; i--)  {
-            stack.push("W",  "W" + i);
-            stack.push("X",  "X" + i);
+
+            stack.push("X" + i);
             //Reserved registers are popped from the stack
-            if (i == 18 || i == 29 || i == 0) {stack.pop("X");}
+            if (i == 18 || i == 29 || i == 0) {stack.pop();}
 
         }
 
@@ -88,10 +98,10 @@ public class CodeGenerator extends AstVisitor {
     }
 
     private String writeBinaryExpressionInstructions(BinaryExpressionNode node, String operation) {
-        String register1 = stack.pop("X");
-        String register2 = stack.pop("X");
+        String register1 = stack.pop();
+        String register2 = stack.pop();
 
-        String resultRegister = stack.pop("X");
+        String resultRegister = stack.pop();
 
         String operand1 = (String) node.getLeft().accept(this);
         String operand2 = (String) node.getRight().accept(this);
@@ -116,11 +126,11 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   " + operation + " " + resultRegister + ", " + register1 + ", " + register2 +"\n\n");
 
-        if (operand1.contains("X")) { stack.push("X", operand1); }
-        if (operand2.contains("X")) { stack.push("X", operand2); }
+        if (operand1.contains("X")) { stack.push( operand1); }
+        if (operand2.contains("X")) { stack.push( operand2); }
 
-        stack.push("X", register2);
-        stack.push("X", register1);
+        stack.push( register2);
+        stack.push( register1);
 
         return resultRegister;
     }
@@ -157,12 +167,12 @@ public class CodeGenerator extends AstVisitor {
 
         String resultRegister = (String) node.getValue().accept(this);
         if (!(resultRegister.contains("X"))) {
-            String varRegister = stack.pop("X");
+            String varRegister = stack.pop();
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
         } else if (resultRegister.contains("function return value")) {
-            String varRegister = stack.pop("X");
+            String varRegister = stack.pop();
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
@@ -173,7 +183,7 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   STR " + resultRegister +", [FP, #-" + address + "]\n\n");
         currentTable.addVariable(identifier, String.valueOf(address));
 
-        stack.push("X", resultRegister);
+        stack.push( resultRegister);
 
         return null;
     }
@@ -187,9 +197,9 @@ public class CodeGenerator extends AstVisitor {
         };
     }
 
-    private String writeEqualityExpressionInstructions(BinaryExpressionNode node, String elseCondition) {
-        String register1 = stack.pop("X");
-        String register2 = stack.pop("X");
+    private String writeEqualityExpressionInstructions(BinaryExpressionNode node, String condition) {
+        String register1 = stack.pop();
+        String register2 = stack.pop();
 
         String operand1 = (String) node.getLeft().accept(this);
         String operand2 = (String) node.getRight().accept(this);
@@ -197,18 +207,18 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
         assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
 
-        if (operand1.contains("X")) { stack.push("X", operand1); }
-        if (operand2.contains("X")) { stack.push("X", operand2); }
+        if (operand1.contains("X")) { stack.push( operand1); }
+        if (operand2.contains("X")) { stack.push( operand2); }
 
-        stack.push("X", register2);
-        stack.push("X", register1);
+        stack.push( register2);
+        stack.push( register1);
 
         String comment = " // " + register1 + " " + node.getOperator()+ " " + register2;
 
 
 
         assemblyCode.append("   CMP " + register1 + ", " + register2 + comment + " \n");
-        return elseCondition;
+        return condition;
     }
 
 
@@ -323,7 +333,7 @@ public class CodeGenerator extends AstVisitor {
         String name = node.getName();
         String address = currentTable.lookupVariable(name);
 
-        String resultRegister = stack.pop("X");
+        String resultRegister = stack.pop();
 
         assemblyCode.append("   LDR " + resultRegister + ", [FP, #-" + address + "] // Load "+ name +"\n");
 
@@ -332,7 +342,9 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitIfElseNode(IfElseNode node) {
-        String elseClause = (String) node.getCondition().accept(this);
+        String ifClause = (String) node.getCondition().accept(this);
+        String elseClause = getElseClause(ifClause);
+
         assemblyCode.append("   B." + elseClause + " elseclause\n");
 
 
@@ -343,6 +355,21 @@ public class CodeGenerator extends AstVisitor {
         if (node.getElseBranch() != null) {node.getElseBranch().accept(this);}
         assemblyCode.append("endif:\n");
         return null;
+    }
+
+    public String getElseClause(String condition) {
+        switch (condition) {
+            case "EQ" -> { //Equals
+                return "NE"; //Does not equal
+            }
+            case "GT" -> { //Greater than
+                return "LT"; //less than
+            }
+            case "GE" -> { // Greater or equals
+                return "LE"; //Less than or Equals
+            }
+        }
+    return null;
     }
 
     @Override
@@ -409,6 +436,13 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitPostFixExpressionNode(PostFixExpressionNode node) {
+        String resultRegister = (String) node.getIdentifierOrConstant().accept(this);
+        String operator = node.getOperator();
+        if (Objects.equals(operator, "++")) {
+            assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"++ \n");
+        } else {
+            assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"-- \n");
+        }
 
         return null;
     }
@@ -418,6 +452,8 @@ public class CodeGenerator extends AstVisitor {
         switch (node.getOperator())
         {
             case ">":
+                return writeEqualityExpressionInstructions(node, "GT");
+            case "<":
                 return writeEqualityExpressionInstructions(node, "LT");
         }
         return null;
@@ -451,17 +487,64 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitForLoopNode(ForLoopNode node) {
+        int localVariableCount = getForLoopLocalVariables(node);
+
+        int spaceToAdd = getSpaceToAdd(localVariableCount);
+
+        String initRegister = (String) visitDeclarationNode(node.getInitialization());
+
+        assemblyCode.append("loop: STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+        assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
+        assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
+
+        addStackSpace(getSpaceToAdd(localVariableCount));
+        node.getBody().accept(this);
+        String condition = (String) node.getCondition().accept(this);
+        assemblyCode.append("\n");
+        String resultRegister = (String) node.getUpdate().accept(this);
+
+        removeStackSpace(getSpaceToAdd(localVariableCount));
+        assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
+        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+        assemblyCode.append("   B." + condition + " loop\n");
+        assemblyCode.append("\n");
+
+        stack.push( initRegister);
         return null;
+    }
+
+    public int getForLoopLocalVariables(ForLoopNode node) {
+        int count = 0;
+        for (BlockItemNode blockItemNode : node.getBody().getBlockItemNodeList()) {
+            if (blockItemNode instanceof DeclarationNode) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public String visitForLoopInitialization(DeclarationNode node) {
+        String register = stack.pop();
+        String value = (String) node.getValue().accept(this);
+        assemblyCode.append("   MOV " + register + ", " + value + " // For loop iterator\n");
+
+        if (value.contains("X")) {stack.push( value);}
+
+        return register;
     }
 
     @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
+        enterScope();
+
         String condition = (String) node.getCondition().accept(this);
         assemblyCode.append("loop: "+ condition);
         assemblyCode.append("   B.EQ loopdone\n");
         node.getBody().accept(this);
         assemblyCode.append("   B loop\n");
         assemblyCode.append("loopdone:\n");
+
+        exitScope();
         return null;
     }
 
