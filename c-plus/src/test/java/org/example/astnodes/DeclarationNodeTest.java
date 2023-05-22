@@ -11,7 +11,6 @@ class DeclarationNodeTest {
     TypeSpecifierNode Jakob = new TypeSpecifierNode("int");
 
 
-
     @Test
     void typeSpecifierNodeTest() {
 

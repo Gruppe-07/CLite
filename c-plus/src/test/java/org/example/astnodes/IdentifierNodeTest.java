@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class IdentifierNodeTest {
 
     IdentifierNode IdNode = new IdentifierNode("Jakob");
-    
-
 
 
     @Test
