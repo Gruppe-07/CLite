@@ -305,6 +305,20 @@ public class PrettyPrinter extends AstVisitor{
         return null;
     }
 
+    @Override
+    public Object visitForLoopNode(ForLoopNode node) {
+        System.out.println(getIndentString() + node.getClass().getSimpleName());
+
+        indent();
+
+        visitDeclarationNode(node.getInitialization());
+        visitExpressionNode(node.getCondition());
+        visitPostFixExpressionNode(node.getUpdate());
+        visitCompoundStatementNode(node.getBody());
+
+        dedent();
+        return null;
+    }
 
     @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
