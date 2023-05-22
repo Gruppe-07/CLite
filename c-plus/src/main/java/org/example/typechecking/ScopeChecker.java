@@ -327,6 +327,15 @@ public class ScopeChecker extends AstVisitor {
     }
 
     @Override
+    public Object visitForLoopNode(ForLoopNode node) {
+        node.getInitialization().accept(this);
+        node.getCondition().accept(this);
+        node.getUpdate().accept(this);
+        node.getBody().accept(this);
+        return null;
+    }
+
+    @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
         node.getCondition().accept(this);
 
