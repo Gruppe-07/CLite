@@ -1,4 +1,4 @@
-package org.example.typechecking;
+package org.example.astnodes;
 
 import org.example.astnodes.DeclarationNode;
 import org.example.astnodes.TypeSpecifierNode;

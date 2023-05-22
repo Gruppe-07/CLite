@@ -7,7 +7,7 @@ public class ScopeCheckerTest extends TestCase {
 
     @Test
     void openScopeTest(){
-        SymbolTable.dep
+        //SymbolTable.dep
 
     }
     public void testEnterScope() {
