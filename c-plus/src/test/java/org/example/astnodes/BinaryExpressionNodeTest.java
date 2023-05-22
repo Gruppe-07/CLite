@@ -12,26 +12,42 @@ class BinaryExpressionNodeTest {
     BinaryExpressionNode BENode = new BinaryExpressionNode(leftTest, rightTest, "operatorTest"){};
 
     @Test
-    void getLeft() {
+    void TestGetLeft() {
+        assertEquals(leftTest, BENode.getLeft());
     }
 
     @Test
-    void setLeft() {
+    void TestSetLeft() {
+        ExpressionNode NewLeft = new ExpressionNode() {};
+        BENode.setLeft(NewLeft);
+        this.leftTest = NewLeft;
+
+        assertEquals(this.leftTest, NewLeft);
     }
 
     @Test
-    void getRight() {
+    void TestGetRight() {
+        assertEquals(rightTest, BENode.getRight());
     }
 
     @Test
-    void setRight() {
+    void TestSetRight() {
+        ExpressionNode NewRight = new ExpressionNode() {};
+        BENode.setRight(NewRight);
+        this.rightTest = NewRight;
+
+        assertEquals(this.rightTest, NewRight);
     }
 
     @Test
-    void getOperator() {
+    void TestGetOperator() {
+        assertEquals("operatorTest", BENode.getOperator());
     }
 
     @Test
-    void setOperator() {
+    void TestSetOperator() {
+        BENode.setOperator("NewOperator");
+
+        assertEquals("NewOperator", BENode.operator);
     }
 }
