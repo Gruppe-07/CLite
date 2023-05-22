@@ -182,14 +182,12 @@ public class CodeGenerator extends AstVisitor {
     public String visitEqualityExpressionNode(EqualityExpressionNode node) {
         switch (node.getOperator()) {
             case "==":
-                return writeEqualityExpressionInstructions(node);
-            //case "/":
-                //return writeBinaryExpressionInstructions(node, "SDIV");
+                return writeEqualityExpressionInstructions(node, "NE");
         }
         return null;
     }
 
-    private String writeEqualityExpressionInstructions(EqualityExpressionNode node) {
+    private String writeEqualityExpressionInstructions(BinaryExpressionNode node, String elseCondition) {
         String register1 = stack.pop("X");
         String register2 = stack.pop("X");
 
@@ -205,7 +203,12 @@ public class CodeGenerator extends AstVisitor {
         stack.push("X", register2);
         stack.push("X", register1);
 
-        return ("   CMP " + register1 + ", " + register2 +"\n");
+        String comment = " // " + register1 + " " + node.getOperator()+ " " + register2;
+
+
+
+        assemblyCode.append("   CMP " + register1 + ", " + register2 + comment + " \n");
+        return elseCondition;
     }
 
 
@@ -226,15 +229,14 @@ public class CodeGenerator extends AstVisitor {
         if (Objects.equals(node.getIdentifierNode().getName(), "printf")) {
             assemblyCode.append("""
                               // Setup
-                              STP X29, LR, [SP, #-16]!
+                              STP X29, LR, [SP, #-16]!     ; Save LR, FR
                               ADRP X0, ptfStr@PAGE 
                               ADD X0, X0, ptfStr@PAGEOFF
                            """);
             assemblyCode.append("   MOV X10, " + resultRegister + "\n");
-            assemblyCode.append("""
-                           STR X10, [SP, #-32]!                              
-                           BL _printf
-                        """);
+            int address = currentTable.getVariableCount() * 8;
+            assemblyCode.append("   STR X10, [SP, #-32]!\n");
+            assemblyCode.append("   BL _printf\n");
             return "#1 // Dummy return value from printf";
         } else {
             assemblyCode.append("   BL " + name + "\n");
@@ -259,17 +261,18 @@ public class CodeGenerator extends AstVisitor {
         int spaceToAdd = getSpaceToAdd(localVariableCount);
 
         if (Objects.equals(name, "main")) {
-            assemblyCode.append("_" + name + ":\n");
+            assemblyCode.append("_" + name + ": STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
             assemblyCode.append("   // Make room for local variables and potential parameter\n");
             assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
             assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
+            addStackSpace(getSpaceToAdd(localVariableCount));
             node.getBody().accept(this);
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
+            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
             assemblyCode.append("   MOV X0, #0\n" +
                     "   MOV X16, #1\n" +
-                    "   SVC #0x80\n\n");
-
+                    "   svc #0x80\n");
         } else {
-
             assemblyCode.append(name + ": STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
             assemblyCode.append("   // Make room for local variables and potential parameter\n");
             assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
@@ -282,12 +285,10 @@ public class CodeGenerator extends AstVisitor {
                 getCurrentTable().addVariable(node.getParameter().getIdentifierNode().getName(), String.valueOf(address));
             }
             node.getBody().accept(this);
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
+            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+            assemblyCode.append("   RET\n");
         }
-
-        assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
-        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
-        assemblyCode.append("   RET\n");
-
 
         removeStackSpace(getSpaceToAdd(localVariableCount));
 
@@ -331,9 +332,11 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitIfElseNode(IfElseNode node) {
-        String condition = (String) node.getCondition().accept(this);
-        assemblyCode.append(condition);
-        assemblyCode.append("   B.GE elseclause\n");
+        String elseClause = (String) node.getCondition().accept(this);
+        assemblyCode.append("   B." + elseClause + " elseclause\n");
+
+
+
         node.getIfBranch().accept(this);
         assemblyCode.append("   B endif\n");
         assemblyCode.append("elseclause: \n");
@@ -412,7 +415,11 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitRelationalExpressionNode(RelationalExpressionNode node) {
-
+        switch (node.getOperator())
+        {
+            case ">":
+                return writeEqualityExpressionInstructions(node, "LT");
+        }
         return null;
     }
 
