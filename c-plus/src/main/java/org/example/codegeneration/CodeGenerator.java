@@ -180,11 +180,11 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitEqualityExpressionNode(EqualityExpressionNode node) {
-        switch (node.getOperator()) {
-            case "==":
-                return writeEqualityExpressionInstructions(node, "NE");
-        }
-        return null;
+        return switch (node.getOperator()) {
+            case "==" -> writeEqualityExpressionInstructions(node, "NE");
+            case "!=" -> writeEqualityExpressionInstructions(node, "EQ");
+            default -> null;
+        };
     }
 
     private String writeEqualityExpressionInstructions(BinaryExpressionNode node, String elseCondition) {
