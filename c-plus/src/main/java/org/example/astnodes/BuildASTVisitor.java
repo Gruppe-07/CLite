@@ -330,7 +330,7 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         CompoundStatementNode ifBranch = visitCompoundStatement(ctx.compoundStatement(0));
 
         if (ctx.compoundStatement(1) != null) {
-            CompoundStatementNode elseBranch = visitCompoundStatement(ctx.compoundStatement(0));
+            CompoundStatementNode elseBranch = visitCompoundStatement(ctx.compoundStatement(1));
             return new IfElseNode(expressionNode, ifBranch, elseBranch);
         }
 

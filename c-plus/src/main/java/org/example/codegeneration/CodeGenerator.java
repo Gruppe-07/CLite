@@ -345,12 +345,9 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public Object visitIfElseNode(IfElseNode node) {
         String ifClause = (String) node.getCondition().accept(this);
-        System.out.println(ifClause);
         String elseClause = getElseClause(ifClause);
 
         assemblyCode.append("   B." + elseClause + " elseclause\n");
-
-
 
         node.getIfBranch().accept(this);
         assemblyCode.append("   B endif\n");
@@ -401,9 +398,6 @@ public class CodeGenerator extends AstVisitor {
         return "#" + node.getValue();
     }
 
-    public String getVariableAddress(IdentifierNode node) {
-        return "test";
-    }
 
     @Override
     public Object visitLogicalAndExpressionNode(LogicalAndExpressionNode node) {
@@ -447,15 +441,28 @@ public class CodeGenerator extends AstVisitor {
     }
 
     @Override
-    public Object visitPostFixExpressionNode(PostFixExpressionNode node) {
-        String resultRegister = (String) node.getIdentifierOrConstant().accept(this);
-        String operator = node.getOperator();
-        if (Objects.equals(operator, "++")) {
-            assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"++ \n");
-        } else {
-            assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"-- \n");
-        }
+    public String visitPostFixExpressionNode(PostFixExpressionNode node) {
+        ExpressionNode operand = node.getIdentifierOrConstant();
+        
+        if (operand instanceof IdentifierNode) {
+            String name = ((IdentifierNode)  operand).getName();
+            String address = getCurrentTable().lookupVariable(name);
 
+
+            String resultRegister = (String) node.getIdentifierOrConstant().accept(this);
+            String operator = node.getOperator();
+            if (Objects.equals(operator, "++")) {
+                assemblyCode.append("   ADD " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"++ \n");
+            } else {
+                assemblyCode.append("   SUB " + resultRegister + ", " + resultRegister + ", #1 // " + resultRegister +"-- \n");
+            }
+            assemblyCode.append("   STR " + resultRegister + ", [FP, #-"+ address + "]\n");
+            return resultRegister;
+        }
+        else if (operand instanceof IntegerConstantNode) {
+            
+        }
+        
         return null;
     }
 
@@ -467,6 +474,10 @@ public class CodeGenerator extends AstVisitor {
                 return writeEqualityExpressionInstructions(node, "GT");
             case "<":
                 return writeEqualityExpressionInstructions(node, "LT");
+            case "<=":
+                return writeEqualityExpressionInstructions(node, "LE");
+            case ">=":
+                return writeEqualityExpressionInstructions(node, "GE");
         }
         return null;
     }
