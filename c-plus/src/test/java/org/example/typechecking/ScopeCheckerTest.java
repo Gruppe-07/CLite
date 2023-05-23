@@ -5,14 +5,25 @@ import org.junit.jupiter.api.Test;
 
 public class ScopeCheckerTest extends TestCase {
 
+    ScopeChecker SCTest = new ScopeChecker();
+
     @Test
     void openScopeTest(){
         //SymbolTable.dep
-
-    }
-    public void testEnterScope() {
     }
 
-    public void testExitScope() {
+    @Test
+    void testEnterScope() {
+    }
+
+    @Test
+    void testExitScope() {
+    }
+    @Test
+    void TestGetCurrentScope() {
+    }
+
+    @Test
+    void TestSetCurrentType() {
     }
 }

@@ -26,8 +26,7 @@ public class FunctionDefinitionNode extends AstNode {
         return identifierNode;
     }
 
-    public ParameterDeclarationNode getParameter() {
-        return parameter;
+    public ParameterDeclarationNode getParameter() { return parameter;
     }
 
     public CompoundStatementNode getBody() {
