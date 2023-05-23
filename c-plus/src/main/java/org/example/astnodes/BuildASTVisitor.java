@@ -26,6 +26,8 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         return new TranslationUnitNode(functionDefinitionNodeList);
     }
 
+
+
     @Override
     public FunctionDefinitionNode visitFunctionDefinition(CLiteParser.FunctionDefinitionContext ctx) {
         TypeSpecifierNode functionTypeSpecifierNode = new TypeSpecifierNode(ctx.typeSpecifier().getText());
@@ -129,6 +131,10 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         if (ctx.While() != null) {
             return visitWhileLoop(ctx);
         }
+        if (ctx.For() != null)
+        {
+            return visitForLoop(ctx);
+        }
         return null;
     }
 
@@ -137,6 +143,15 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
         ExpressionNode condition = visitExpression(ctx.expression());
         CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
         return new WhileLoopNode(condition, body);
+    }
+
+    public ForLoopNode visitForLoop(CLiteParser.IterationStatementContext ctx) {
+        DeclarationNode initialization = visitDeclaration(ctx.declaration());
+        ExpressionNode condition = visitExpression(ctx.expression());
+        PostFixExpressionNode update = (PostFixExpressionNode) visitIncrementDecrement(ctx.incrementDecrement());
+        CompoundStatementNode body = visitCompoundStatement(ctx.compoundStatement());
+
+        return new ForLoopNode(initialization, condition, update, body);
     }
 
     //Expressions

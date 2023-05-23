@@ -37,6 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /src/main/java/com/myparser/
-
-### Windows ###
-/src/main/java/com/myparser/
+/assembly/
