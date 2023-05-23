@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TranslationUnitNodeTest {
 
-    TranslationUnitNode TUNode = new TranslationUnitNode("test");
+    //TranslationUnitNode TUNode = new TranslationUnitNode("test");
     @Test
     void getFunctionDefinitionNodeList() {
 
