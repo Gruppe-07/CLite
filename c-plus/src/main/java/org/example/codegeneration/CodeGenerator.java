@@ -342,15 +342,15 @@ public class CodeGenerator extends AstVisitor {
 
         enterScope();
         assemblyCode.append("   B." + elseClause + " elseclause"+  hash + "\n");
-        assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-        assemblyCode.append("   SUB FP, SP, #" + spaceToAddIf +"\n");
-        assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
+        assemblyCode.append("   //STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+        assemblyCode.append("   //SUB FP, SP, #" + spaceToAddIf +"\n");
+        assemblyCode.append("   //SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
 
 
         node.getIfBranch().accept(this);
         assemblyCode.append("   B endif"+  hash + "\n");
-        assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
-        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+        assemblyCode.append("   //ADD SP, SP, #" + spaceToAddIf + "\n");
+        assemblyCode.append("   //LDP LR, FP, [SP], #16 // Restore LR, FP\n");
         assemblyCode.append("elseclause"+  hash + ": \n");
 
         removeStackSpace(localIfVariableCount);
@@ -362,16 +362,16 @@ public class CodeGenerator extends AstVisitor {
             enterScope();
             addStackSpace(localElseVariables);
 
-            assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-            assemblyCode.append("   SUB FP, SP, #" + spaceToAddElse +"\n");
-            assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
+            assemblyCode.append("   //STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+            assemblyCode.append("   //SUB FP, SP, #" + spaceToAddElse +"\n");
+            assemblyCode.append("   //SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
 
 
             node.getElseBranch().accept(this);
 
 
-            assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
-            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+            assemblyCode.append("   //ADD SP, SP, #" + spaceToAddIf + "\n");
+            assemblyCode.append("   //LDP LR, FP, [SP], #16 // Restore LR, FP\n");
 
             removeStackSpace(localElseVariables);
 
