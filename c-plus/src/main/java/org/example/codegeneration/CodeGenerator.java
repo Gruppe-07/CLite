@@ -14,18 +14,12 @@ public class CodeGenerator extends AstVisitor {
     private Stack<String> registerStack;
     private VariableTable currentTable;
 
-    public int getStackSpace() {
-        return stackSpace;
-    }
-    private int stackSpace; //Variable to keep track of allocated stack space
-
     public int getScopeLevel() {
         return scopeLevel;
     }
 
     private int scopeLevel;
-    public void addStackSpace(int amount) {stackSpace+= amount;} //Stack must be 16-byte aligned
-    public void removeStackSpace(int amount) {stackSpace-= amount;}
+
 
     public void enterScope() {
         scopeLevel++;
@@ -40,7 +34,6 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode = new StringBuilder();
         registerStack = new Stack<>();
         currentTable = new VariableTable(null);
-        stackSpace = 0;
         scopeLevel = 0;
 
         for (int i = 30; i >= 0; i--)  {
@@ -227,14 +220,15 @@ public class CodeGenerator extends AstVisitor {
         }
         if (Objects.equals(node.getIdentifierNode().getName(), "printf")) {
             assemblyCode.append("""
-                              // Setup
+                              
+                              // Setup for printf
                               ADRP X0, ptfStr@PAGE 
                               ADD X0, X0, ptfStr@PAGEOFF
                            """);
             assemblyCode.append("   MOV X10, " + resultRegister + "\n");
             int address = currentTable.getVariableCount() * 8;
             assemblyCode.append("   STR X10, [SP, #-16]!\n");
-            assemblyCode.append("   BL _printf\n");
+            assemblyCode.append("\n   BL _printf\n\n");
             assemblyCode.append("   ADD SP, SP, #16\n");
             return "#1 // Dummy return value from printf";
         } else {
@@ -262,7 +256,7 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   // Make room for local variables and potential parameter\n");
             assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
             assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
-            addStackSpace(getSpaceToAdd(localVariableCount));
+
             node.getBody().accept(this);
             assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
             assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
@@ -274,7 +268,6 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   // Make room for local variables and potential parameter\n");
             assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
             assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
-            addStackSpace(getSpaceToAdd(localVariableCount));
 
             if (node.getParameter() != null) {
                 int address = currentTable.getVariableCount() * 8;
@@ -288,7 +281,6 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   RET\n\n");
         }
 
-        removeStackSpace(getSpaceToAdd(localVariableCount));
 
         exitScope();
 
@@ -296,9 +288,11 @@ public class CodeGenerator extends AstVisitor {
     }
 
     public int getSpaceToAdd(int variables) {
-        //One variable requires 8 bytes. Stack must be 16 byte aligned
-        return (int) Math.ceil(((double) variables / 2)) * 16;
+        // One variable requires 8 bytes. Stack must be 16 byte aligned.
+        // Divide variables by 2, round up to the nearest integer, and multiply by 16.
+        return ((variables + 1) / 2) * 16;
     }
+
 
     public int getLocalVariableCount(FunctionDefinitionNode node) {
         return countDeclarations(node.getBody());
@@ -335,49 +329,43 @@ public class CodeGenerator extends AstVisitor {
 
         int spaceToAddIf = getSpaceToAdd(localIfVariableCount);
 
-        addStackSpace(localIfVariableCount);
-
         String ifClause = (String) node.getCondition().accept(this);
         String elseClause = getElseClause(ifClause);
 
         enterScope();
-        assemblyCode.append("   B." + elseClause + " elseclause"+  hash + "\n");
-        assemblyCode.append("   //STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-        assemblyCode.append("   //SUB FP, SP, #" + spaceToAddIf +"\n");
-        assemblyCode.append("   //SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
+        assemblyCode.append("\n   B." + elseClause + " elseclause"+  hash + "\n\n");
+        assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+        assemblyCode.append("   SUB FP, SP, #" + spaceToAddIf +"\n");
+        assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
 
 
         node.getIfBranch().accept(this);
-        assemblyCode.append("   B endif"+  hash + "\n");
-        assemblyCode.append("   //ADD SP, SP, #" + spaceToAddIf + "\n");
-        assemblyCode.append("   //LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+        assemblyCode.append("   B endif"+  hash + "\n\n");
+        assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
+        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n\n");
         assemblyCode.append("elseclause"+  hash + ": \n");
 
-        removeStackSpace(localIfVariableCount);
         exitScope();
 
         if (node.getElseBranch() != null) {
             int localElseVariables = getBodyLocalVariables(node.getIfBranch());
             int spaceToAddElse = getSpaceToAdd(localIfVariableCount);
             enterScope();
-            addStackSpace(localElseVariables);
 
-            assemblyCode.append("   //STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-            assemblyCode.append("   //SUB FP, SP, #" + spaceToAddElse +"\n");
-            assemblyCode.append("   //SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
+            assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+            assemblyCode.append("   SUB FP, SP, #" + spaceToAddElse +"\n");
+            assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
 
 
             node.getElseBranch().accept(this);
 
 
-            assemblyCode.append("   //ADD SP, SP, #" + spaceToAddIf + "\n");
-            assemblyCode.append("   //LDP LR, FP, [SP], #16 // Restore LR, FP\n");
-
-            removeStackSpace(localElseVariables);
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
+            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
 
             exitScope();
         }
-        assemblyCode.append("endif"+  hash + ":\n");
+        assemblyCode.append("\nendif"+  hash + ":\n");
         return null;
     }
 
@@ -569,14 +557,12 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("loop: // STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
         assemblyCode.append("   // SUB FP, SP, #" + spaceToAdd +"\n");
         assemblyCode.append("   // SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
-
-        addStackSpace(getSpaceToAdd(localVariableCount));
         node.getBody().accept(this);
         String condition = (String) node.getCondition().accept(this);
         assemblyCode.append("\n");
+
         String resultRegister = (String) node.getUpdate().accept(this);
 
-        removeStackSpace(getSpaceToAdd(localVariableCount));
         assemblyCode.append("   // ADD SP, SP, #" + spaceToAdd + "\n");
         assemblyCode.append("   // LDP LR, FP, [SP], #16 // Restore LR, FP\n");
         assemblyCode.append("   B." + condition + " loop\n");
@@ -611,9 +597,11 @@ public class CodeGenerator extends AstVisitor {
     public Object visitWhileLoopNode(WhileLoopNode node) {
         enterScope();
 
+        assemblyCode.append("loop:");
         String condition = (String) node.getCondition().accept(this);
-        assemblyCode.append("loop: "+ condition);
-        assemblyCode.append("   B.EQ loopdone\n");
+        String inverseCondition = getElseClause(condition);
+
+        assemblyCode.append("   B."+ inverseCondition+ " loopdone\n");
         node.getBody().accept(this);
         assemblyCode.append("   B loop\n");
         assemblyCode.append("loopdone:\n");
