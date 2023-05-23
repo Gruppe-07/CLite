@@ -11,13 +11,12 @@ import java.util.Stack;
 
 public class CodeGenerator extends AstVisitor {
     private StringBuilder assemblyCode;
-    private Stack<String> stack;
+    private Stack<String> registerStack;
     private VariableTable currentTable;
 
     public int getStackSpace() {
         return stackSpace;
     }
-
     private int stackSpace; //Variable to keep track of allocated stack space
 
     public int getScopeLevel() {
@@ -39,17 +38,15 @@ public class CodeGenerator extends AstVisitor {
     }
     public void generateCode(TranslationUnitNode node) {
         assemblyCode = new StringBuilder();
-        stack = new Stack<>();
+        registerStack = new Stack<>();
         currentTable = new VariableTable(null);
         stackSpace = 0;
         scopeLevel = 0;
 
         for (int i = 30; i >= 0; i--)  {
-
-            stack.push("X" + i);
+            registerStack.push("X" + i);
             //Reserved registers are popped from the stack
-            if (i == 18 || i == 29 || i == 0) {stack.pop();}
-
+            if (i == 18 || i == 29 || i == 0) { registerStack.pop();}
         }
 
         assemblyCode.append("""
@@ -98,10 +95,10 @@ public class CodeGenerator extends AstVisitor {
     }
 
     private String writeBinaryExpressionInstructions(BinaryExpressionNode node, String operation) {
-        String register1 = stack.pop();
-        String register2 = stack.pop();
+        String register1 = registerStack.pop();
+        String register2 = registerStack.pop();
 
-        String resultRegister = stack.pop();
+        String resultRegister = registerStack.pop();
 
         String operand1 = (String) node.getLeft().accept(this);
         String operand2 = (String) node.getRight().accept(this);
@@ -126,11 +123,11 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   " + operation + " " + resultRegister + ", " + register1 + ", " + register2 +"\n\n");
 
-        if (operand1.contains("X")) { stack.push( operand1); }
-        if (operand2.contains("X")) { stack.push( operand2); }
+        if (operand1.contains("X")) { registerStack.push( operand1); }
+        if (operand2.contains("X")) { registerStack.push( operand2); }
 
-        stack.push( register2);
-        stack.push( register1);
+        registerStack.push( register2);
+        registerStack.push( register1);
 
         return resultRegister;
     }
@@ -167,12 +164,12 @@ public class CodeGenerator extends AstVisitor {
 
         String resultRegister = (String) node.getValue().accept(this);
         if (!(resultRegister.contains("X"))) {
-            String varRegister = stack.pop();
+            String varRegister = registerStack.pop();
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
         } else if (resultRegister.contains("function return value")) {
-            String varRegister = stack.pop();
+            String varRegister = registerStack.pop();
 
             assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
             resultRegister = varRegister;
@@ -183,7 +180,7 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   STR " + resultRegister +", [FP, #-" + address + "]\n\n");
         currentTable.addVariable(identifier, String.valueOf(address));
 
-        stack.push( resultRegister);
+        registerStack.push( resultRegister);
 
         return null;
     }
@@ -198,8 +195,8 @@ public class CodeGenerator extends AstVisitor {
     }
 
     private String writeEqualityExpressionInstructions(BinaryExpressionNode node, String condition) {
-        String register1 = stack.pop();
-        String register2 = stack.pop();
+        String register1 = registerStack.pop();
+        String register2 = registerStack.pop();
 
         String operand1 = (String) node.getLeft().accept(this);
         String operand2 = (String) node.getRight().accept(this);
@@ -207,11 +204,11 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
         assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
 
-        if (operand1.contains("X")) { stack.push( operand1); }
-        if (operand2.contains("X")) { stack.push( operand2); }
+        if (operand1.contains("X")) { registerStack.push( operand1); }
+        if (operand2.contains("X")) { registerStack.push( operand2); }
 
-        stack.push( register2);
-        stack.push( register1);
+        registerStack.push( register2);
+        registerStack.push( register1);
 
         String comment = " // " + register1 + " " + node.getOperator()+ " " + register2;
 
@@ -258,7 +255,6 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitFunctionDefinitionNode(FunctionDefinitionNode node) {
-
         enterScope();
 
         String name = node.getIdentifierNode().getName();
@@ -333,7 +329,7 @@ public class CodeGenerator extends AstVisitor {
         String name = node.getName();
         String address = currentTable.lookupVariable(name);
 
-        String resultRegister = stack.pop();
+        String resultRegister = registerStack.pop();
 
         assemblyCode.append("   LDR " + resultRegister + ", [FP, #-" + address + "] // Load "+ name +"\n");
 
@@ -509,7 +505,7 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   B." + condition + " loop\n");
         assemblyCode.append("\n");
 
-        stack.push( initRegister);
+        registerStack.push( initRegister);
         return null;
     }
 
@@ -524,11 +520,12 @@ public class CodeGenerator extends AstVisitor {
     }
 
     public String visitForLoopInitialization(DeclarationNode node) {
-        String register = stack.pop();
+        String register = registerStack.pop();
         String value = (String) node.getValue().accept(this);
         assemblyCode.append("   MOV " + register + ", " + value + " // For loop iterator\n");
 
-        if (value.contains("X")) {stack.push( value);}
+        if (value.contains("X")) {
+            registerStack.push( value);}
 
         return register;
     }
