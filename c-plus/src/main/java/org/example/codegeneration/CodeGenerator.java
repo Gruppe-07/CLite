@@ -136,9 +136,15 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitAssignmentExpressionNode(AssignmentExpressionNode node) {
-        //TODO ensure that variables aren't loaded twice and
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
+        IdentifierNode identifierNode = (IdentifierNode) node.getLeft();
+        String name = identifierNode.getName();
+
+        String address = getCurrentTable().lookupVariable(name);
+
+        String resultRegister = (String) node.getRight().accept(this);
+
+        assemblyCode.append("   STR " + resultRegister + ", [FP, #-" + address + "]\n");
+
         return null;
     }
 
@@ -267,6 +273,7 @@ public class CodeGenerator extends AstVisitor {
         int spaceToAdd = getSpaceToAdd(localVariableCount);
 
         if (Objects.equals(name, "main")) {
+
             assemblyCode.append("_" + name + ": STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
             assemblyCode.append("   // Make room for local variables and potential parameter\n");
             assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
@@ -288,7 +295,8 @@ public class CodeGenerator extends AstVisitor {
             if (node.getParameter() != null) {
                 int address = currentTable.getVariableCount() * 8;
                 assemblyCode.append("   STR X0, [FP, #-"+ address +"] // Push parameter to stack\n");
-                getCurrentTable().addVariable(node.getParameter().getIdentifierNode().getName(), String.valueOf(address));
+                String parameterName = node.getParameter().getIdentifierNode().getName();
+                getCurrentTable().addVariable(parameterName, String.valueOf(address));
             }
             node.getBody().accept(this);
             assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
