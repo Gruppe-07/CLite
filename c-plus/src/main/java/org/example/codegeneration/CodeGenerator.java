@@ -103,20 +103,6 @@ public class CodeGenerator extends AstVisitor {
         String operand1 = (String) node.getLeft().accept(this);
         String operand2 = (String) node.getRight().accept(this);
 
-        //If operand1 is a variable
-        if (!(operand1.contains("#")) && !(operand1.contains("X"))) {
-            //TODO lookup address and set operand1 as variable address
-            operand1 = "address";
-            assemblyCode.append("   LDR \n");
-        }
-
-        //If operand2 is a variable
-        if (!(operand2.contains("#")) && !(operand2.contains("X"))) {
-            //TODO lookup address and set operand2 as variable address
-            operand2 = "address";
-            assemblyCode.append("   LDR , \n");
-        }
-
 
         assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
         assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
@@ -344,16 +330,54 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitIfElseNode(IfElseNode node) {
+        int hash = node.hashCode();
+        int localIfVariableCount = getBodyLocalVariables(node.getIfBranch());
+
+        int spaceToAddIf = getSpaceToAdd(localIfVariableCount);
+
+        addStackSpace(localIfVariableCount);
+
         String ifClause = (String) node.getCondition().accept(this);
         String elseClause = getElseClause(ifClause);
 
-        assemblyCode.append("   B." + elseClause + " elseclause\n");
+        enterScope();
+        assemblyCode.append("   B." + elseClause + " elseclause"+  hash + "\n");
+        assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+        assemblyCode.append("   SUB FP, SP, #" + spaceToAddIf +"\n");
+        assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
+
 
         node.getIfBranch().accept(this);
-        assemblyCode.append("   B endif\n");
-        assemblyCode.append("elseclause: \n");
-        if (node.getElseBranch() != null) {node.getElseBranch().accept(this);}
-        assemblyCode.append("endif:\n");
+        assemblyCode.append("   B endif"+  hash + "\n");
+        assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
+        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+        assemblyCode.append("elseclause"+  hash + ": \n");
+
+        removeStackSpace(localIfVariableCount);
+        exitScope();
+
+        if (node.getElseBranch() != null) {
+            int localElseVariables = getBodyLocalVariables(node.getIfBranch());
+            int spaceToAddElse = getSpaceToAdd(localIfVariableCount);
+            enterScope();
+            addStackSpace(localElseVariables);
+
+            assemblyCode.append("   STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+            assemblyCode.append("   SUB FP, SP, #" + spaceToAddElse +"\n");
+            assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
+
+
+            node.getElseBranch().accept(this);
+
+
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
+            assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+
+            removeStackSpace(localElseVariables);
+
+            exitScope();
+        }
+        assemblyCode.append("endif"+  hash + ":\n");
         return null;
     }
 
@@ -418,8 +442,34 @@ public class CodeGenerator extends AstVisitor {
                 return writeBinaryExpressionInstructions(node, "MUL");
             case "/":
                 return writeBinaryExpressionInstructions(node, "SDIV");
+            case "%":
+                return writeModuloExpression(node);
         }
         return null;
+    }
+
+    public String writeModuloExpression(MultiplicativeExpressionNode node) {
+        String register1 = registerStack.pop();
+        String register2 = registerStack.pop();
+
+        String resultRegister = registerStack.pop();
+
+        String operand1 = (String) node.getLeft().accept(this);
+        String operand2 = (String) node.getRight().accept(this);
+
+        assemblyCode.append("   MOV " + register1 + ", " + operand1 + "\n");
+        assemblyCode.append("   MOV " + register2 + ", " + operand2 + "\n");
+
+        assemblyCode.append("   UDIV " + resultRegister + ", " + register1 + ", " + register2 +"\n\n");
+        assemblyCode.append("   MSUB " + resultRegister + ", " + resultRegister + ", " + register2 + ", " + register1 +"\n\n");
+
+        if (operand1.contains("X")) { registerStack.push( operand1); }
+        if (operand2.contains("X")) { registerStack.push( operand2); }
+
+        registerStack.push( register2);
+        registerStack.push( register1);
+
+        return resultRegister;
     }
 
     @Override
@@ -510,7 +560,7 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitForLoopNode(ForLoopNode node) {
-        int localVariableCount = getForLoopLocalVariables(node);
+        int localVariableCount = getBodyLocalVariables(node.getBody());
 
         int spaceToAdd = getSpaceToAdd(localVariableCount);
 
@@ -536,9 +586,9 @@ public class CodeGenerator extends AstVisitor {
         return null;
     }
 
-    public int getForLoopLocalVariables(ForLoopNode node) {
+    public int getBodyLocalVariables(CompoundStatementNode node) {
         int count = 0;
-        for (BlockItemNode blockItemNode : node.getBody().getBlockItemNodeList()) {
+        for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             if (blockItemNode instanceof DeclarationNode) {
                 count++;
             }
