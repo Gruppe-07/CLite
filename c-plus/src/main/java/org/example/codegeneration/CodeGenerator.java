@@ -516,9 +516,9 @@ public class CodeGenerator extends AstVisitor {
 
         String initRegister = (String) visitDeclarationNode(node.getInitialization());
 
-        assemblyCode.append("loop: STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
-        assemblyCode.append("   SUB FP, SP, #" + spaceToAdd +"\n");
-        assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
+        assemblyCode.append("loop: // STP LR, FP, [SP, #-16]! //Push LR, FP onto stack\n");
+        assemblyCode.append("   // SUB FP, SP, #" + spaceToAdd +"\n");
+        assemblyCode.append("   // SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
 
         addStackSpace(getSpaceToAdd(localVariableCount));
         node.getBody().accept(this);
@@ -527,8 +527,8 @@ public class CodeGenerator extends AstVisitor {
         String resultRegister = (String) node.getUpdate().accept(this);
 
         removeStackSpace(getSpaceToAdd(localVariableCount));
-        assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
-        assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
+        assemblyCode.append("   // ADD SP, SP, #" + spaceToAdd + "\n");
+        assemblyCode.append("   // LDP LR, FP, [SP], #16 // Restore LR, FP\n");
         assemblyCode.append("   B." + condition + " loop\n");
         assemblyCode.append("\n");
 
