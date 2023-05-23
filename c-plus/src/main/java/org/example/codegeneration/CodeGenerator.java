@@ -194,8 +194,8 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public String visitEqualityExpressionNode(EqualityExpressionNode node) {
         return switch (node.getOperator()) {
-            case "==" -> writeEqualityExpressionInstructions(node, "NE");
-            case "!=" -> writeEqualityExpressionInstructions(node, "EQ");
+            case "==" -> writeEqualityExpressionInstructions(node, "EQ");
+            case "!=" -> writeEqualityExpressionInstructions(node, "NE");
             default -> null;
         };
     }
@@ -242,14 +242,14 @@ public class CodeGenerator extends AstVisitor {
         if (Objects.equals(node.getIdentifierNode().getName(), "printf")) {
             assemblyCode.append("""
                               // Setup
-                              STP X29, LR, [SP, #-16]!     ; Save LR, FR
                               ADRP X0, ptfStr@PAGE 
                               ADD X0, X0, ptfStr@PAGEOFF
                            """);
             assemblyCode.append("   MOV X10, " + resultRegister + "\n");
             int address = currentTable.getVariableCount() * 8;
-            assemblyCode.append("   STR X10, [SP, #-32]!\n");
+            assemblyCode.append("   STR X10, [SP, #-16]!\n");
             assemblyCode.append("   BL _printf\n");
+            assemblyCode.append("   ADD SP, SP, #16\n");
             return "#1 // Dummy return value from printf";
         } else {
             assemblyCode.append("   BL " + name + "\n");
@@ -265,8 +265,6 @@ public class CodeGenerator extends AstVisitor {
 
         String name = node.getIdentifierNode().getName();
         int localVariableCount = getLocalVariableCount(node);
-
-        //TODO find a way to count number of printf calls in function to manage stack allocation
 
         if (node.getParameter() != null) { node.getParameter().accept(this); localVariableCount++;}
 
@@ -301,7 +299,7 @@ public class CodeGenerator extends AstVisitor {
             node.getBody().accept(this);
             assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
             assemblyCode.append("   LDP LR, FP, [SP], #16 // Restore LR, FP\n");
-            assemblyCode.append("   RET\n");
+            assemblyCode.append("   RET\n\n");
         }
 
         removeStackSpace(getSpaceToAdd(localVariableCount));
@@ -347,6 +345,7 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public Object visitIfElseNode(IfElseNode node) {
         String ifClause = (String) node.getCondition().accept(this);
+        System.out.println(ifClause);
         String elseClause = getElseClause(ifClause);
 
         assemblyCode.append("   B." + elseClause + " elseclause\n");
@@ -363,14 +362,23 @@ public class CodeGenerator extends AstVisitor {
 
     public String getElseClause(String condition) {
         switch (condition) {
-            case "EQ" -> { //Equals
-                return "NE"; //Does not equal
+            case "EQ" -> { // Equals
+                return "NE"; // Does not equal
             }
-            case "GT" -> { //Greater than
-                return "LT"; //less than
+            case "GT" -> { // Greater than
+                return "LE"; // Less than or equals
             }
             case "GE" -> { // Greater or equals
-                return "LE"; //Less than or Equals
+                return "LT"; // Less than
+            }
+            case "NE" -> { // Does not equal
+                return "EQ"; // Equals
+            }
+            case "LT" -> { // Less than
+                return "GE"; // Greater than or equals
+            }
+            case "LE" -> { // Less than or Equals
+                return "GT"; // Greater than
             }
         }
     return null;
