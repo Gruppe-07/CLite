@@ -11,6 +11,7 @@ import com.myparser.parser.CLiteParser;
 import org.example.astnodes.BuildASTVisitor;
 import org.example.astnodes.TranslationUnitNode;
 import org.example.codegeneration.CodeGenerator;
+import org.example.codegeneration.TerminalRunner;
 import org.example.typechecking.ScopeChecker;
 
 public class Main {
@@ -38,6 +39,9 @@ public class Main {
 
             CodeGenerator codeGenerator = new CodeGenerator();
             codeGenerator.generateCode(ast);
+
+            //TerminalRunner runner = new TerminalRunner();
+            //runner.runProgram();
 
 
         } catch (IOException e) {
