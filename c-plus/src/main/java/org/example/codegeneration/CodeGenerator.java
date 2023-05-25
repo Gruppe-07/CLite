@@ -567,10 +567,11 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("    SUB FP, SP, #" + spaceToAdd +"\n");
         assemblyCode.append("    SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
         node.getBody().accept(this);
+        String resultRegister = (String) node.getUpdate().accept(this);
         String condition = (String) node.getCondition().accept(this);
         assemblyCode.append("\n");
 
-        String resultRegister = (String) node.getUpdate().accept(this);
+
 
         assemblyCode.append("    ADD SP, SP, #" + spaceToAdd + "\n");
         assemblyCode.append("   B." + condition + " loop\n");
