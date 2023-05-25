@@ -7,6 +7,8 @@ public class VariableTable {
     private final Map<String, String> variables;
     private final VariableTable parent;
 
+    int addedStackSpace = 0;
+
     public VariableTable(VariableTable parent) {
         this.variables = new HashMap<>();
         this.parent = parent;
@@ -24,6 +26,22 @@ public class VariableTable {
             return parent.lookupVariable(name);
         } else {
             return 0;
+        }
+    }
+
+    public void setAddedStackSpace(int addedStackSpace) {
+        this.addedStackSpace = addedStackSpace;
+    }
+
+    public int getAddedStackSpace() {
+        return addedStackSpace;
+    }
+
+    public int getAllAddedStackSpace() {
+        if (parent != null) {
+            return addedStackSpace + parent.getAllAddedStackSpace();
+        } else {
+            return addedStackSpace;
         }
     }
 
