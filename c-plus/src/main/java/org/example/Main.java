@@ -31,17 +31,16 @@ public class Main {
             CLiteParser.CompilationUnitContext cst = parser.compilationUnit(); // replace "yourStartRule" with the name of your grammar's start rule
             TranslationUnitNode ast = new BuildASTVisitor().visitCompilationUnit(cst);
 
-            PrettyPrinter prettyPrinter = new PrettyPrinter();
-            prettyPrinter.visitTranslationUnitNode(ast);
-
             ScopeChecker scopeChecker = new ScopeChecker();
             scopeChecker.checkScope(ast);
+
+            PrettyPrinter prettyPrinter = new PrettyPrinter();
+            prettyPrinter.visitTranslationUnitNode(ast);
 
             CodeGenerator codeGenerator = new CodeGenerator();
             codeGenerator.generateCode(ast);
 
-            //TerminalRunner runner = new TerminalRunner();
-            //runner.runProgram();
+
 
 
         } catch (IOException e) {
