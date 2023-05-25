@@ -21,9 +21,22 @@ public class VariableTable {
         if (address != null) {
             return address;
         } else if (parent != null) {
+
             return parent.lookupVariable(name);
         } else {
             return null;
+        }
+    }
+
+    public int getScopeLevelOfVariable(String name, int lookUpCount) {
+        String address = variables.get(name);
+        if (address != null) {
+            return lookUpCount;
+        } else if (parent != null) {
+
+            return parent.getScopeLevelOfVariable(name, lookUpCount + 1);
+        } else {
+            return 0;
         }
     }
 
@@ -49,3 +62,4 @@ public class VariableTable {
                 '}';
     }
 }
+
