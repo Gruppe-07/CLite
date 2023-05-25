@@ -239,7 +239,7 @@ public class CodeGenerator extends AstVisitor {
 
         if (node.getParameter() != null) { node.getParameter().accept(this); localVariableCount++;}
 
-        int spaceToAdd = localVariableCount * 8;
+        int spaceToAdd = getSpaceToAdd(localVariableCount);
 
         if (Objects.equals(name, "main")) {
 
@@ -305,8 +305,6 @@ public class CodeGenerator extends AstVisitor {
 
     public int getAddress(String name) {
         int tableAddress = getCurrentTable().lookupVariable(name);
-
-        System.out.println(name + tableAddress);
 
         return tableAddress;
     }
