@@ -69,8 +69,6 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public String visitAdditiveExpressionNode(AdditiveExpressionNode node) {
-
-        //This code is reached when subexpression is evaluated
         switch (node.getOperator()) {
             case "+" -> {
                 return writeBinaryExpressionInstructions(node, "ADD");
@@ -142,25 +140,25 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("   // Declare " + identifier + "\n");
 
-        String resultRegister = (String) node.getValue().accept(this);
-        if (!(resultRegister.contains("X"))) {
+        String result = (String) node.getValue().accept(this);
+        if (!(result.contains("X"))) {
             String varRegister = registerStack.pop();
 
-            assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
-            resultRegister = varRegister;
-        } else if (resultRegister.contains("function return value")) {
+            assemblyCode.append("   MOV " + varRegister + ", " + result + "\n");
+            result = varRegister;
+        } else if (result.contains("function return value")) {
             String varRegister = registerStack.pop();
 
-            assemblyCode.append("   MOV " + varRegister + ", " + resultRegister + "\n");
-            resultRegister = varRegister;
+            assemblyCode.append("   MOV " + varRegister + ", " + result + "\n");
+            result = varRegister;
         }
 
         int address = -1 * currentTable.getVariableCount() * 8;
 
-        assemblyCode.append("   STR " + resultRegister +", [FP, #" + address + "]\n\n");
+        assemblyCode.append("   STR " + result +", [FP, #" + address + "]\n\n");
         currentTable.addVariable(identifier, String.valueOf(address));
 
-        registerStack.push(resultRegister);
+        registerStack.push(result);
 
         return null;
     }
@@ -347,9 +345,9 @@ public class CodeGenerator extends AstVisitor {
         //assemblyCode.append("   SUB FP, SP, #" + spaceToAddIf +"\n");
         //assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
 
-        //enterScope();
+        enterScope();
         node.getIfBranch().accept(this);
-        //exitScope();
+        exitScope();
 
         //assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
 
@@ -366,9 +364,9 @@ public class CodeGenerator extends AstVisitor {
             //assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
 
 
-            //enterScope();
+            enterScope();
             node.getElseBranch().accept(this);
-            //exitScope();
+            exitScope();
 
 
             //assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
@@ -605,7 +603,7 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
-        //enterScope();
+        enterScope();
 
         assemblyCode.append("loop:");
         String condition = (String) node.getCondition().accept(this);
@@ -616,7 +614,7 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("   B loop\n");
         assemblyCode.append("loopdone:\n");
 
-        //exitScope();
+        exitScope();
         return null;
     }
 
