@@ -16,32 +16,24 @@ public class VariableTable {
         variables.put(name, address);
     }
 
-    public String lookupVariable(String name) {
+    public int lookupVariable(String name) {
         String address = variables.get(name);
         if (address != null) {
-            return address;
+            return Integer.parseInt(address);
         } else if (parent != null) {
-
             return parent.lookupVariable(name);
-        } else {
-            return null;
-        }
-    }
-
-    public int getScopeLevelOfVariable(String name, int lookUpCount) {
-        String address = variables.get(name);
-        if (address != null) {
-            return lookUpCount;
-        } else if (parent != null) {
-
-            return parent.getScopeLevelOfVariable(name, lookUpCount + 1);
         } else {
             return 0;
         }
     }
 
-    public int getVariableCount() {
-        return variables.size();
+
+    public int getVariableCount () {
+        if (parent != null) {
+            return variables.size() + parent.getVariableCount();
+        } else {
+            return variables.size();
+        }
     }
 
     public VariableTable enterScope() {
@@ -51,8 +43,6 @@ public class VariableTable {
     public VariableTable getParent() {
         return parent;
     }
-
-
 
     @Override
     public String toString() {
