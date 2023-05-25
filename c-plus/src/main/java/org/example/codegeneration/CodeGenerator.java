@@ -281,7 +281,7 @@ public class CodeGenerator extends AstVisitor {
     }
 
     public int getSpaceToAdd(int variables) {
-        // One variable requires 8 bytes. Stack must be 16 byte aligned.
+        // One 64 bit variable requires 8 bytes. Stack must be 16 byte aligned.
         // Divide variables by 2, round up to the nearest integer, and multiply by 16.
         return ((variables + 1) / 2) * 16;
     }
