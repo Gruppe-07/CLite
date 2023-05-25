@@ -111,7 +111,7 @@ public class CodeGenerator extends AstVisitor {
         IdentifierNode identifierNode = (IdentifierNode) node.getLeft();
         String name = identifierNode.getName();
 
-        String address = getCurrentTable().lookupVariable(name);
+        int address = getCurrentTable().lookupVariable(name);
 
         String resultRegister = (String) node.getRight().accept(this);
 
@@ -242,10 +242,12 @@ public class CodeGenerator extends AstVisitor {
 
         String name = node.getIdentifierNode().getName();
         int localVariableCount = getLocalVariableCount(node);
+        int spaceToAdd = getSpaceToAdd(localVariableCount);
+
 
         if (node.getParameter() != null) { node.getParameter().accept(this); localVariableCount++;}
 
-        int spaceToAdd = getSpaceToAdd(localVariableCount);
+
 
         if (Objects.equals(name, "main")) {
 
@@ -310,7 +312,7 @@ public class CodeGenerator extends AstVisitor {
     }
 
     public int getAddress(String name) {
-        int tableAddress = Integer.parseInt(getCurrentTable().lookupVariable(name));
+        int tableAddress = getCurrentTable().lookupVariable(name);
 
         System.out.println(name + tableAddress);
 
@@ -319,18 +321,18 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public String visitIdentifierNode(IdentifierNode node) {
         String name = node.getName();
-
         int address = getAddress(name);
 
         String resultRegister = registerStack.pop();
 
-        assemblyCode.append("   LDR " + resultRegister + ", [FP, #" + address + "] // Load "+ name +"\n");
+        assemblyCode.append("   LDR " + resultRegister + ", [FP, #" + (address) + "] // Load "+ name +"\n");
 
         return resultRegister;
     }
 
     @Override
     public Object visitIfElseNode(IfElseNode node) {
+        enterScope();
         int hash = node.hashCode();
         int localIfVariableCount = getBodyLocalVariables(node.getIfBranch());
 
@@ -342,37 +344,34 @@ public class CodeGenerator extends AstVisitor {
 
         assemblyCode.append("\n   B." + elseClause + " elseclause"+  hash + "\n\n");
 
-        //assemblyCode.append("   SUB FP, SP, #" + spaceToAddIf +"\n");
-        //assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
 
-        enterScope();
+        assemblyCode.append("   SUB SP, SP, #" + spaceToAddIf + " // Space for local variables\n\n");
+
+
+
         node.getIfBranch().accept(this);
-        exitScope();
 
-        //assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
+
+        assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
 
         assemblyCode.append("   B endif"+  hash + "\n\n");
+        exitScope();
         assemblyCode.append("elseclause"+  hash + ": \n");
 
 
 
         if (node.getElseBranch() != null) {
-            int localElseVariables = getBodyLocalVariables(node.getIfBranch());
-            int spaceToAddElse = getSpaceToAdd(localIfVariableCount);
-
-            //assemblyCode.append("   SUB FP, SP, #" + spaceToAddElse +"\n");
-            //assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
-
-
             enterScope();
+            int localElseVariableCount = getBodyLocalVariables(node.getIfBranch());
+            int spaceToAddElse = getSpaceToAdd(localElseVariableCount);
+
+
+            assemblyCode.append("   SUB SP, SP, #" + spaceToAddElse + " // Space for local variables\n\n");
+
             node.getElseBranch().accept(this);
+
+            assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
             exitScope();
-
-
-            //assemblyCode.append("   ADD SP, SP, #" + spaceToAddIf + "\n");
-
-
-
         }
         assemblyCode.append("\nendif"+  hash + ":\n");
         return null;
@@ -434,15 +433,12 @@ public class CodeGenerator extends AstVisitor {
     @Override
     public String visitMultiplicativeExpressionNode(MultiplicativeExpressionNode node) {
 
-        switch (node.getOperator()) {
-            case "*":
-                return writeBinaryExpressionInstructions(node, "MUL");
-            case "/":
-                return writeBinaryExpressionInstructions(node, "SDIV");
-            case "%":
-                return writeModuloExpression(node);
-        }
-        return null;
+        return switch (node.getOperator()) {
+            case "*" -> writeBinaryExpressionInstructions(node, "MUL");
+            case "/" -> writeBinaryExpressionInstructions(node, "SDIV");
+            case "%" -> writeModuloExpression(node);
+            default -> null;
+        };
     }
 
     public String writeModuloExpression(MultiplicativeExpressionNode node) {
@@ -493,7 +489,7 @@ public class CodeGenerator extends AstVisitor {
         
         if (operand instanceof IdentifierNode) {
             String name = ((IdentifierNode)  operand).getName();
-            String address = getCurrentTable().lookupVariable(name);
+            int address = getCurrentTable().lookupVariable(name);
 
 
             String resultRegister = (String) node.getIdentifierOrConstant().accept(this);
@@ -506,10 +502,6 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   STR " + resultRegister + ", [FP, #"+ address + "]\n");
             return resultRegister;
         }
-        else if (operand instanceof IntegerConstantNode) {
-            
-        }
-        
         return null;
     }
 
@@ -557,17 +549,16 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitForLoopNode(ForLoopNode node) {
+        enterScope();
         int localVariableCount = getBodyLocalVariables(node.getBody());
-
         int spaceToAdd = getSpaceToAdd(localVariableCount);
 
         String initRegister = (String) visitDeclarationNode(node.getInitialization());
 
         assemblyCode.append("loop:\n");
-        assemblyCode.append("    SUB FP, SP, #" + spaceToAdd +"\n");
         assemblyCode.append("    SUB SP, SP, #" + spaceToAdd + " // Space for local variables\n\n");
         node.getBody().accept(this);
-        String resultRegister = (String) node.getUpdate().accept(this);
+        node.getUpdate().accept(this);
         String condition = (String) node.getCondition().accept(this);
         assemblyCode.append("\n");
 
@@ -578,6 +569,7 @@ public class CodeGenerator extends AstVisitor {
         assemblyCode.append("\n");
 
         registerStack.push( initRegister);
+        exitScope();
         return null;
     }
 
@@ -591,27 +583,22 @@ public class CodeGenerator extends AstVisitor {
         return count;
     }
 
-    public String visitForLoopInitialization(DeclarationNode node) {
-        String register = registerStack.pop();
-        String value = (String) node.getValue().accept(this);
-        assemblyCode.append("   MOV " + register + ", " + value + " // For loop iterator\n");
-
-        if (value.contains("X")) {
-            registerStack.push( value);}
-
-        return register;
-    }
-
     @Override
     public Object visitWhileLoopNode(WhileLoopNode node) {
         enterScope();
 
+        int spaceToAdd = getBodyLocalVariables(node.getBody());
+
         assemblyCode.append("loop:");
+        assemblyCode.append("   // Make room for local variables\n");
+        assemblyCode.append("   SUB SP, SP, #" + spaceToAdd + "\n\n");
         String condition = (String) node.getCondition().accept(this);
         String inverseCondition = getElseClause(condition);
 
+        assemblyCode.append("   ADD SP, SP, #" + spaceToAdd + "\n");
         assemblyCode.append("   B."+ inverseCondition+ " loopdone\n");
         node.getBody().accept(this);
+
         assemblyCode.append("   B loop\n");
         assemblyCode.append("loopdone:\n");
 
