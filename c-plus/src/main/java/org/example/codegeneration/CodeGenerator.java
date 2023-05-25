@@ -53,15 +53,15 @@ public class CodeGenerator extends AstVisitor {
                         .text
                         """);
 
-        writeToFile("assembly/output.s", assemblyCode.toString());
+        writeToFile(assemblyCode.toString());
     }
 
-    private void writeToFile(String fileName, String content) {
+    private void writeToFile(String content) {
         try {
-            FileWriter writer = new FileWriter(fileName);
+            FileWriter writer = new FileWriter("assembly/output.s");
             writer.write(content);
             writer.close();
-            System.out.println("Successfully wrote content to " + fileName);
+            System.out.println("Successfully wrote content to " + "assembly/output.s");
         } catch (IOException e) {
             System.out.println("An error occurred while writing the file: " + e.getMessage());
         }
@@ -212,8 +212,6 @@ public class CodeGenerator extends AstVisitor {
             assemblyCode.append("   MOV X0, " + resultRegister + " // Load parameter into X0\n");
         }
         if (Objects.equals(node.getIdentifierNode().getName(), "printf")) {
-            int varCount = getCurrentTable().getVariableCount();
-            int printfParamAddress = -1 * ((varCount) * 8);
             assemblyCode.append("""
                               
                               // Setup for printf
@@ -221,9 +219,6 @@ public class CodeGenerator extends AstVisitor {
                               ADD X0, X0, ptfStr@PAGEOFF
                            """);
             assemblyCode.append("   MOV X10, " + resultRegister + "\n");
-            int address = currentTable.getVariableCount() * 8;
-            //assemblyCode.append("   SUB FP, SP, #16\n");
-            //assemblyCode.append("   SUB SP, SP, #16\n\n");
             assemblyCode.append("   STR X10, [SP, #-16]!\n");
             assemblyCode.append("\n   BL _printf\n\n");
             assemblyCode.append("   ADD SP, SP, #16\n");
@@ -231,7 +226,6 @@ public class CodeGenerator extends AstVisitor {
         } else {
             assemblyCode.append("   BL " + name + "\n");
         }
-
 
         return "X0 // X0 = Register of function return value";
     }
@@ -242,12 +236,10 @@ public class CodeGenerator extends AstVisitor {
 
         String name = node.getIdentifierNode().getName();
         int localVariableCount = getLocalVariableCount(node);
-        int spaceToAdd = getSpaceToAdd(localVariableCount);
-
 
         if (node.getParameter() != null) { node.getParameter().accept(this); localVariableCount++;}
 
-
+        int spaceToAdd = localVariableCount * 8;
 
         if (Objects.equals(name, "main")) {
 
@@ -507,18 +499,13 @@ public class CodeGenerator extends AstVisitor {
 
     @Override
     public Object visitRelationalExpressionNode(RelationalExpressionNode node) {
-        switch (node.getOperator())
-        {
-            case ">":
-                return writeEqualityExpressionInstructions(node, "GT");
-            case "<":
-                return writeEqualityExpressionInstructions(node, "LT");
-            case "<=":
-                return writeEqualityExpressionInstructions(node, "LE");
-            case ">=":
-                return writeEqualityExpressionInstructions(node, "GE");
-        }
-        return null;
+        return switch (node.getOperator()) {
+            case ">" -> writeEqualityExpressionInstructions(node, "GT");
+            case "<" -> writeEqualityExpressionInstructions(node, "LT");
+            case "<=" -> writeEqualityExpressionInstructions(node, "LE");
+            case ">=" -> writeEqualityExpressionInstructions(node, "GE");
+            default -> null;
+        };
     }
 
     @Override
