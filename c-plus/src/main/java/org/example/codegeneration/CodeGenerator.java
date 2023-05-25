@@ -304,9 +304,7 @@ public class CodeGenerator extends AstVisitor {
     }
 
     public int getAddress(String name) {
-        int tableAddress = getCurrentTable().lookupVariable(name);
-
-        return tableAddress;
+        return getCurrentTable().lookupVariable(name);
     }
     @Override
     public String visitIdentifierNode(IdentifierNode node) {
@@ -396,17 +394,6 @@ public class CodeGenerator extends AstVisitor {
         return "#" + node.getValue();
     }
 
-    public String visitBinaryExpression(BinaryExpressionNode node) {
-        return (String) node.accept(this);
-    }
-
-    public String getIntegerConstant(IntegerConstantNode node) {
-        return "#" + node.getValue();
-    }
-
-    public String getDoubleConstant(FloatConstantNode node) {
-        return "#" + node.getValue();
-    }
 
 
     @Override
