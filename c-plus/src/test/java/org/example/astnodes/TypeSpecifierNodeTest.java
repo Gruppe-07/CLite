@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TypeSpecifierNodeTest {
 
-    TypeSpecifierNode TestTypeSpecifierNode = new TypeSpecifierNode("TestType");
+    TypeSpecifierNode TestTypeSpecifierNode = new TypeSpecifierNode("int");
 
     @Test
     void TypeIntIsInt() {
-        assertEquals("TestType", TestTypeSpecifierNode.getType());
+        assertEquals("int", TestTypeSpecifierNode.getType());
     }
 }
