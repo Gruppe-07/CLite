@@ -222,10 +222,10 @@ public class CodeGenerator extends AstVisitor {
                               ADD X0, X0, ptfStr@PAGEOFF
                               //SUB SP, SP, #16
                            """);
-            //assemblyCode.append("   MOV X10, " + resultRegister + "\n");
-            //assemblyCode.append("   STR X10, [SP, #-16]!\n");
+            assemblyCode.append("   MOV X10, " + resultRegister + "\n");
+            assemblyCode.append("   STR X10, [SP, #-16]!\n");
             assemblyCode.append("\n   BL _printf\n\n");
-            //assemblyCode.append("   ADD SP, SP, #16\n");
+            assemblyCode.append("   ADD SP, SP, #16\n");
             return "#1 // Dummy return value from printf";
         } else {
             assemblyCode.append("   BL " + name + "\n");
