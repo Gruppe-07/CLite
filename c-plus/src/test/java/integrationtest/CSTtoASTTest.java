@@ -45,7 +45,7 @@ public class CSTtoASTTest {
             CLiteLexer lexer = new CLiteLexer(charStream);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             CLiteParser parser = new CLiteParser(tokenStream);
-            CLiteParser.CompilationUnitContext cst = parser.compilationUnit(); 
+            CLiteParser.CompilationUnitContext cst = parser.compilationUnit();
 
             return cst;
 
