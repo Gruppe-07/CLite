@@ -19,6 +19,9 @@ public class BuildASTVisitor extends CLiteBaseVisitor<AstNode> {
 
     @Override
     public TranslationUnitNode visitTranslationUnit(CLiteParser.TranslationUnitContext ctx) {
+        if(ctx.functionDefinition() == null)
+            return null;
+
         List<FunctionDefinitionNode> functionDefinitionNodeList = new ArrayList<>();
         for (CLiteParser.FunctionDefinitionContext child : ctx.functionDefinition()) {
             functionDefinitionNodeList.add(visitFunctionDefinition(child));

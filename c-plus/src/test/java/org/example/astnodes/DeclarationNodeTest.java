@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class DeclarationNodeTest {
 
     DeclarationNode DclNode = new DeclarationNode();
-    Boolean isConstant = new Boolean(String.valueOf(1));
+    Boolean isConstant = Boolean.parseBoolean(String.valueOf(1));
     TypeSpecifierNode Jakob = new TypeSpecifierNode("int");
 
     IdentifierNode IdNode = new IdentifierNode("Id123");

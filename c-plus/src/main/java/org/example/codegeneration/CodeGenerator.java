@@ -3,6 +3,7 @@ package org.example.codegeneration;
 import org.example.AstVisitor;
 import org.example.astnodes.*;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class CodeGenerator extends AstVisitor {
 
         setCurrentTable(getCurrentTable().getParent());
     }
-    public void generateCode(TranslationUnitNode node) {
+    public File generateCode(TranslationUnitNode node, String fileName) {
         assemblyCode = new StringBuilder();
         registerStack = new Stack<>();
         currentTable = new VariableTable(null);
@@ -53,18 +54,20 @@ public class CodeGenerator extends AstVisitor {
                         .text
                         """);
 
-        writeToFile(assemblyCode.toString());
+        return writeToFile(assemblyCode.toString(), fileName +".s");
     }
 
-    private void writeToFile(String content) {
+    private File writeToFile(String content, String fileName) {
+        File file = new File("assembly/" + fileName);
         try {
-            FileWriter writer = new FileWriter("assembly/output.s");
+            FileWriter writer = new FileWriter(fileName);
             writer.write(content);
             writer.close();
-            System.out.println("Successfully wrote content to " + "assembly/output.s");
+            System.out.println("Successfully wrote content to " + "assembly/"+ fileName);
         } catch (IOException e) {
             System.out.println("An error occurred while writing the file: " + e.getMessage());
         }
+        return file;
     }
 
     @Override
