@@ -60,7 +60,7 @@ public class CodeGenerator extends AstVisitor {
     private File writeToFile(String content, String fileName) {
         File file = new File("assembly/" + fileName);
         try {
-            FileWriter writer = new FileWriter(fileName);
+            FileWriter writer = new FileWriter(file);
             writer.write(content);
             writer.close();
             System.out.println("Successfully wrote content to " + "assembly/"+ fileName);
