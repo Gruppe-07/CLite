@@ -15,9 +15,6 @@ public class CodeGenerator extends AstVisitor {
     private Stack<String> registerStack;
     private VariableTable currentTable;
 
-
-
-
     public void enterScope() {
 
         setCurrentTable(getCurrentTable().enterScope());
@@ -193,8 +190,6 @@ public class CodeGenerator extends AstVisitor {
 
         String comment = " // " + register1 + " " + node.getOperator()+ " " + register2;
 
-
-
         assemblyCode.append("   CMP " + register1 + ", " + register2 + comment + " \n");
         return condition;
     }
@@ -301,7 +296,6 @@ public class CodeGenerator extends AstVisitor {
         for (BlockItemNode blockItemNode : node.getBlockItemNodeList()) {
             if (blockItemNode instanceof DeclarationNode) {
                 count++;
-
             }
         }
         return count;
